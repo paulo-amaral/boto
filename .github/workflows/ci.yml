@@ -17,25 +17,19 @@ jobs:
         with:
           persist-credentials: false
       - run: bash Scripts/secret-scan.sh --all
-  commits:
+  pr-title:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
           persist-credentials: false
-      # Subjects are untrusted input: they reach the script as quoted arguments, never inside the shell text.
-      - name: Check commit subjects
+      # Squash merging turns the title into the commit on main. It is untrusted input, so it reaches the script as a
+      # quoted argument through the environment, never inside the shell text.
+      - name: Check the pull request title
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          failed=0
-          while IFS= read -r subject; do
-            bash Scripts/check-commit-subject.sh "$subject" || failed=1
-          done < <(git log --no-merges --format=%s "$BASE_SHA..$HEAD_SHA")
-          exit "$failed"
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: bash Scripts/check-commit-subject.sh "$PR_TITLE"
   test:
     runs-on: macos-15
     steps:

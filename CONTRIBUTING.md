@@ -17,7 +17,7 @@ git config core.hooksPath .githooks
 swift test
 ```
 
-The hooks block commits that contain secrets or local data files, and reject a commit subject that does not follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/): `type(scope): description`, at most 72 characters, for example `fix(calendar): remove the event when a card is archived`. Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`. Use `!` after the type for a breaking change. Merge, revert, fixup and squash subjects made by git pass. The rule is in `Scripts/check-commit-subject.sh`; CI runs it on every pull request, so a branch with a bad subject fails the `commits` job.
+The hooks block commits that contain secrets or local data files, and reject a commit subject that does not follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/): `type(scope): description`, at most 72 characters, for example `fix(calendar): remove the event when a card is archived`. Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`. Use `!` after the type for a breaking change. Merge, revert, fixup and squash subjects made by git pass. The rule is in `Scripts/check-commit-subject.sh`.
 
 ## Pull requests
 
@@ -26,5 +26,6 @@ The hooks block commits that contain secrets or local data files, and reject a c
 - Core logic goes in `KanbanCore` and must not depend on SwiftUI. Views go in `KanbanUI`.
 - `swift test` must pass. For interface changes, run the app and say what you checked.
 - Commits are signed when possible. Do not use `--no-verify`.
+- The pull request title follows Conventional Commits too: pull requests are squash merged, so the title becomes the commit on `main` and GitHub adds the pull request number, for example `feat(mcp): add boto-mcp (#12)`. CI checks the title. The commits inside the branch are not kept.
 
 By contributing you agree that your work is licensed under the [GNU AGPL-3.0](LICENSE).
