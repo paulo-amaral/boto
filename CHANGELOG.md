@@ -7,8 +7,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 ## [0.2.0] - 2026-10-27
 
 ### Added
-- Duplicate project, in the project menu: a copy with the same boards, lists, labels, checklists and cards. Hours, activity and Apple Calendar links stay with the original.
-- `boto-mcp`, an MCP server inside the app for AI assistants: read boards, cards and hours, and create, edit, move and archive cards, tick checklist items and log time. It only reads unless started with `--allow-writes`, and it has no delete tool.
+- Duplicate project, in the project menu: a copy with the same boards, lists, labels, checklists and cards, or Duplicate without cards for an empty template. Hours, activity and Apple Calendar links stay with the original.
+- `boto-mcp`, an MCP server inside the app for AI assistants: read boards, cards and hours, and create, edit, move and archive cards, duplicate projects, tick checklist items and log time. It only reads unless started with `--allow-writes`, and it has no delete tool.
 - Project icons: pick one from the Lucide set (about 1,900, ISC licence) with search by name or topic, or leave it to Boto. In the sidebar, right-click a project and choose Change icon.
 - Recently deleted: a sidebar entry that lists deleted projects, lists and cards and restores each one. A list comes back with its cards.
 
@@ -19,7 +19,7 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 - README grouped by topic, with new screenshots of the full Hours window and report.
 - Status colours (done, in progress, warning, danger) live in the theme, and progress and a running timer use one blue.
 - The card title is smaller (20 pt, semibold), in proportion to the text around it.
-- Help has an AI assistants topic with the command that connects the MCP server.
+- Help has an AI assistants topic with the command that connects the MCP server and a button that copies it. Help text can now be selected and copied.
 - Deleting a list or a card asks first, and the list prompt says how many cards go with it.
 
 ### Fixed

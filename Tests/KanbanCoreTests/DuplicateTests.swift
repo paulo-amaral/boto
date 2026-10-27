@@ -131,6 +131,24 @@ final class DuplicateTests: XCTestCase {
         XCTAssertEqual(project.duplicate(named: "B", in: context).iconName, "lucide:rocket")
     }
 
+    func testWithoutCardsOnlyTheStructureIsCopied() throws {
+        let (project, board, _, _) = try makeOriginal()
+        let archivedList = BoardList(name: "Parked", index: 3)
+        archivedList.archivedAt = Date()
+        board.lists.append(archivedList)
+        let copy = project.duplicate(named: "Template", withCards: false, in: try XCTUnwrap(container).mainContext)
+        try XCTUnwrap(container).mainContext.save()
+        let copyBoard = try XCTUnwrap(copy.activeBoards.first)
+        XCTAssertEqual(copyBoard.orderedLists.map(\.name), ["To do", "In progress", "Done", "Parked"])
+        XCTAssertTrue(copyBoard.orderedLists.allSatisfy { $0.orderedCards.isEmpty }, "no cards")
+        XCTAssertEqual(copyBoard.orderedLists[1].wipLimit, 2)
+        XCTAssertEqual(copyBoard.orderedLists[1].policy, "Finish before starting")
+        XCTAssertTrue(copyBoard.orderedLists[3].isArchived)
+        XCTAssertEqual(copyBoard.labels.map(\.name), ["Research"])
+        XCTAssertEqual(copy.rootFolderPath, "/Clients/Northwind")
+        XCTAssertEqual(project.activeBoards.first?.orderedLists[1].orderedCards.count, 1, "the original keeps its cards")
+    }
+
     func testDuplicatingTwiceGivesTwoIndependentCopies() throws {
         let (project, _, _, _) = try makeOriginal()
         let context = try XCTUnwrap(container).mainContext

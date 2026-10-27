@@ -12,11 +12,13 @@ struct HelpView: View {
         return (bundle.hasSuffix(".app") ? bundle : "/Applications/Boto.app") + "/Contents/MacOS/boto-mcp"
     }
 
+    private static var mcpCommand: String { "claude mcp add boto -- \"\(mcpPath)\"" }
+
     private let topics: [(title: String, lines: [String])] = [
         ("Projects", [
             "Create a project with the + in the sidebar or with ⌘N. Right-click a project to rename it, set its root folder or delete it.",
             "Change icon, in the project menu, picks the project's icon from about 1,900 Lucide icons, with search; Automatic hands the choice back to Boto.",
-            "Duplicate project, in the project menu, makes a copy with the same boards, lists, labels, checklists and cards, and opens it. Hours, activity, the Kaizen log and Apple Calendar links stay with the original, so the copy starts without history. It is also a way to reuse a project as a template.",
+            "Duplicate project, in the project menu, makes a copy with the same boards, lists, labels, checklists and cards, and opens it. Hours, activity, the Kaizen log and Apple Calendar links stay with the original, so the copy starts without history. Duplicate without cards copies only the structure (boards, lists with their limits and policies, labels), an empty template for the next engagement.",
             "The project menu (the ... in the board header, or right-click in the sidebar) has Edit root folder, Archive project, Add to favorites and Delete project. Each project gets its own icon automatically, and it cannot be changed; the collapsed sidebar shows that icon. Favorites are listed first. Archived projects are hidden, and left out of search, until you click the archive icon next to PROJECTS.",
             "The root folder is usually the client folder or your Obsidian vault. Boto keeps a link to it and never copies your files. Set, change or reveal it from the ... menu in the board header.",
             "Collapse the sidebar with the button at its top; it keeps one tile per project. In a window narrower than 700 points the kanban columns become one vertical list, with each list under the previous one. In a window narrower than 900 points the sidebar collapses by itself, the buttons in the board header lose their text, and lists get narrower. Rename a project or a list by double-clicking its name.",
@@ -71,7 +73,7 @@ struct HelpView: View {
         ]),
         ("AI assistants", [
             "Boto includes boto-mcp, a small server that lets an AI assistant such as Claude read your boards. It runs on your Mac, and only when the assistant starts it.",
-            "In Claude Code, run: claude mcp add boto -- \"\(HelpView.mcpPath)\". In another assistant, add that path as a stdio server in its MCP settings.",
+            "In Claude Code, run: \(HelpView.mcpCommand). In another assistant, add \(HelpView.mcpPath) as a stdio server in its MCP settings.",
             "It only reads by default. To let the assistant create and change cards, add the argument --allow-writes. No tool deletes anything, and a card on the Apple Calendar can only be completed or archived inside Boto.",
             "What the assistant reads is sent to the company that runs its model. Do not connect it to boards you cannot share.",
         ]),
@@ -109,7 +111,13 @@ struct HelpView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text(topic.title.uppercased()).font(Theme.font(10, weight: .semibold)).foregroundStyle(Theme.muted)
                             ForEach(topic.lines, id: \.self) { line in
-                                Text(line).font(Theme.font(13)).fixedSize(horizontal: false, vertical: true)
+                                Text(line).font(Theme.font(13)).fixedSize(horizontal: false, vertical: true).textSelection(.enabled)
+                            }
+                            if topic.title == "AI assistants" {
+                                Button("Copy the Claude Code command") {
+                                    NSPasteboard.general.clearContents()
+                                    NSPasteboard.general.setString(HelpView.mcpCommand, forType: .string)
+                                }
                             }
                             if topic.title == "Backups" {
                                 Button("Show backups in Finder") {

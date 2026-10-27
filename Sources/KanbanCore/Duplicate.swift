@@ -5,7 +5,8 @@ import SwiftData
 /// their checklists, references, colour, importance and dates. It leaves behind what belongs to the original's
 /// history: hours, activity, the Kaizen log, the Apple Calendar link (two cards cannot share one event) and the flow
 /// timestamps, which imported work also goes without, so the copy does not inflate throughput or cycle time.
-/// Deleted boards, lists and cards stay deleted. Archived ones stay archived.
+/// Deleted boards, lists and cards stay deleted. Archived ones stay archived. Without cards, only the structure is
+/// copied (boards, lists with their flow settings, labels), which makes an empty template.
 extension Project {
     /// "Name copy", then "Name copy 2", and so on, so a copy never takes a name that is already in use.
     public static func copyName(of name: String, among existing: [String]) -> String {
@@ -18,20 +19,20 @@ extension Project {
     }
 
     @discardableResult
-    public func duplicate(named newName: String, in context: ModelContext) -> Project {
+    public func duplicate(named newName: String, withCards: Bool = true, in context: ModelContext) -> Project {
         let copy = Project(name: newName)
         context.insert(copy)
         copy.rootFolderPath = rootFolderPath
         copy.rootFolderBookmark = rootFolderBookmark
         // An icon the person picked is kept. An automatic one is left for the app to assign, so the copy looks different.
         if iconName.flatMap(ProjectIcons.lucideName(in:)) != nil { copy.iconName = iconName }
-        for board in activeBoards { copy.boards.append(board.copied()) }
+        for board in activeBoards { copy.boards.append(board.copied(withCards: withCards)) }
         return copy
     }
 }
 
 extension Board {
-    fileprivate func copied() -> Board {
+    fileprivate func copied(withCards: Bool) -> Board {
         let copy = Board(name: name)
         var labels: [ObjectIdentifier: Label] = [:]
         for label in self.labels {
@@ -40,20 +41,20 @@ extension Board {
             labels[ObjectIdentifier(label)] = labelCopy
         }
         for list in lists.filter({ $0.deletedAt == nil }).sorted(by: { $0.index < $1.index }) {
-            copy.lists.append(list.copied(labels))
+            copy.lists.append(list.copied(labels, withCards: withCards))
         }
         return copy
     }
 }
 
 extension BoardList {
-    fileprivate func copied(_ labels: [ObjectIdentifier: Label]) -> BoardList {
+    fileprivate func copied(_ labels: [ObjectIdentifier: Label], withCards: Bool) -> BoardList {
         let copy = BoardList(name: name, index: index)
         copy.stageRaw = stageRaw
         copy.wipLimit = wipLimit
         copy.policy = policy
         copy.archivedAt = archivedAt
-        for card in orderedCards { card.copy(into: copy, labels) }
+        if withCards { for card in orderedCards { card.copy(into: copy, labels) } }
         return copy
     }
 }
