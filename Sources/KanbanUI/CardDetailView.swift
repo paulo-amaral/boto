@@ -54,12 +54,6 @@ struct CardDetailView: View {
         }
     }
 
-    /// "Colour..." in the Add menu on a card with no colour yet: the swatch that normally hosts the picker does not
-    /// exist until a colour is set, so the picker opens from the Add button instead.
-    private var colourFromAdd: Binding<Bool> {
-        Binding(get: { popover == .colour && card.colorHex == nil }, set: { if !$0 && popover == .colour { popover = nil } })
-    }
-
     private func isShowing(_ chip: Chip) -> Binding<Bool> {
         Binding(get: { popover == chip }, set: { if !$0 && popover == chip { popover = nil } })
     }
@@ -191,9 +185,9 @@ struct CardDetailView: View {
     private var chipsRow: some View {
         FlowLayout(spacing: 8) {
             chip("Add", "plus", .add) { addChoices }
-                .popover(isPresented: colourFromAdd, arrowEdge: .bottom) { ColorChoice(hex: $card.colorHex).padding(14) }
             chip("Labels", "tag", .labels) { labelsEditor }
             chip("Importance", "exclamationmark.circle", .importance) { importanceChoices }
+            chip("Colour", "paintpalette", .colour) { ColorChoice(hex: $card.colorHex).padding(14) }
             chip("Dates", "clock", .dates) { datePicker }
             chip(card.totalSeconds() > 0 ? "Time \(TimeReport.clock(card.totalSeconds()))" : "Time", "hourglass", .time) { TimeForm(card: card) }
             chip(card.isBlocked ? "Blocked" : "Block", card.isBlocked ? "hand.raised.fill" : "hand.raised", .blocked) { blockForm }
@@ -273,7 +267,6 @@ struct CardDetailView: View {
                             Circle().fill(Color(hex: hex)).frame(width: 28, height: 28)
                         }
                         .buttonStyle(.plain)
-                        .popover(isPresented: isShowing(.colour), arrowEdge: .bottom) { ColorChoice(hex: $card.colorHex).padding(14) }
                     }
                 }
             }
@@ -354,7 +347,6 @@ struct CardDetailView: View {
         DropdownPanel(entries: [
             DropdownEntry(icon: "paperclip", title: "File, folder or note...") { chooseReferences() },
             DropdownEntry(icon: "chevron.left.forwardslash.chevron.right", title: "GitHub issue or PR...") { addingGitHub = true },
-            DropdownEntry(icon: "paintpalette", title: "Colour...") { popover = .colour },
         ]) { popover = nil }
         .sheet(isPresented: $addingGitHub) { AddGitHubSheet(card: card) }
     }
