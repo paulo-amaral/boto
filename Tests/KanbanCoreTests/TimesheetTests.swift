@@ -76,3 +76,10 @@ final class TimesheetTests: XCTestCase {
         XCTAssertTrue(lines[2].hasSuffix(",\"1.50\""))
     }
 }
+
+final class CSVInjectionTests: XCTestCase {
+    func testFormulaLookingFieldsAreNeutralisedAndQuotesEscaped() {
+        let line = TimeReport.csvLine(["=HYPERLINK(\"x\")", "+1", "-2", "@sum", "\tx", "plain", "say \"hi\"", ""])
+        XCTAssertEqual(line, "\"'=HYPERLINK(\"\"x\"\")\",\"'+1\",\"'-2\",\"'@sum\",\"'\tx\",\"plain\",\"say \"\"hi\"\"\",\"\"")
+    }
+}

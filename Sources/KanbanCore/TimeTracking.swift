@@ -131,10 +131,18 @@ public struct TimeReport {
         let date = ISO8601DateFormatter()
         date.formatOptions = [.withFullDate]
         let lines = rows.map { row in
-            [date.string(from: row.day), row.cardTitle, row.note, Self.decimalHours(row.seconds)]
-                .map { "\"" + $0.replacingOccurrences(of: "\"", with: "\"\"") + "\"" }.joined(separator: ",")
+            Self.csvLine([date.string(from: row.day), row.cardTitle, row.note, Self.decimalHours(row.seconds)])
         }
         return (["\"Date\",\"Card\",\"Note\",\"Hours\""] + lines).joined(separator: "\n") + "\n"
+    }
+
+    /// One quoted CSV line. A field that starts with = + - @ tab or CR would run as a formula when the file is opened in
+    /// a spreadsheet (titles can come from a Trello import), so those get a leading apostrophe (OWASP CSV injection).
+    static func csvLine(_ fields: [String]) -> String {
+        fields.map { field in
+            let safe = field.first.map { "=+-@\t\r".contains($0) } == true ? "'" + field : field
+            return "\"" + safe.replacingOccurrences(of: "\"", with: "\"\"") + "\""
+        }.joined(separator: ",")
     }
 
     static func decimalHours(_ seconds: Int) -> String { String(format: "%.2f", locale: Locale(identifier: "en_US_POSIX"), Double(seconds) / 3600) }

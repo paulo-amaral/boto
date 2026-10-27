@@ -1,2 +1,2 @@
-#!/bin/zsh
+#!/bin/bash
 exec "$(git rev-parse --show-toplevel)/Scripts/secret-scan.sh"

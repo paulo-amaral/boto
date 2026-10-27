@@ -1,0 +1,7 @@
+#!/bin/bash
+# Prefixes the subject with a sequential number, "#3 Add feature": the count of commits on the branch plus one.
+# A subject that already starts with "#<number>" is left alone, so merges, reverts and rewording keep their number.
+msg_file=$1
+case "$(head -n1 "$msg_file")" in "#"[0-9]*) exit 0 ;; esac
+next=$(( $(git rev-list --count HEAD 2>/dev/null || echo 0) + 1 ))
+{ printf '#%s ' "$next"; cat "$msg_file"; } > "$msg_file.tmp" && mv "$msg_file.tmp" "$msg_file"

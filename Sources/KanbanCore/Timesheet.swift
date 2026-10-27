@@ -84,9 +84,7 @@ public struct Timesheet {
     public var csv: String {
         let date = ISO8601DateFormatter()
         date.formatOptions = [.withFullDate]
-        func quoted(_ fields: [String]) -> String {
-            fields.map { "\"" + $0.replacingOccurrences(of: "\"", with: "\"\"") + "\"" }.joined(separator: ",")
-        }
+        let quoted = TimeReport.csvLine
         let header = quoted(["Task"] + days.map(date.string(from:)) + ["Total"])
         let body = rows.filter { $0.total > 0 }.map { quoted([$0.title] + $0.seconds.map(TimeReport.decimalHours) + [TimeReport.decimalHours($0.total)]) }
         let totals = quoted(["Total"] + columnTotals.map(TimeReport.decimalHours) + [TimeReport.decimalHours(grandTotal)])
