@@ -94,6 +94,34 @@ Cada release traz o checksum SHA-256 e uma atestação de proveniência. Verifiq
 
 Requer macOS 14 ou superior.
 
+## Usar o Boto com um assistente de IA (MCP)
+
+O Boto inclui o `boto-mcp`, um servidor do [Model Context Protocol](https://modelcontextprotocol.io) que permite a um assistente, como o Claude, ler seus quadros e atualizá-los. Ele roda no seu Mac e conversa com o assistente por entrada e saída padrão. Abre o mesmo banco de dados do app.
+
+Adicione-o às configurações de MCP do assistente, com o caminho do app instalado:
+
+```json
+{
+  "mcpServers": {
+    "boto": {
+      "command": "/Applications/Boto.app/Contents/MacOS/boto-mcp"
+    }
+  }
+}
+```
+
+Acrescente `"args": ["--read-only"]` para o assistente só ler, sem alterar nada.
+
+| Leitura | Escrita |
+|---|---|
+| `list_projects`, `get_board`, `get_card`, `search`, `get_time_report` | `create_card`, `update_card`, `move_card`, `set_card_archived`, `add_checklist_item`, `set_checklist_item_completed`, `log_time` |
+
+- Não há ferramenta de exclusão. Excluir e restaurar ficam no app, em Recently deleted.
+- Um cartão que está no Apple Calendar não pode ser concluído nem arquivado por aqui, porque isso remove o evento e só o app tem a permissão do calendário. Faça no app.
+- Os textos têm limite de tamanho, os ids são conferidos e um argumento inválido não altera nada.
+- O que uma ferramenta devolve vai para o assistente e, dele, para a empresa que opera o modelo. Use `--read-only`, ou não conecte, para quadros que você não pode compartilhar.
+- Não verificado: se uma janela do Boto já aberta mostra na hora as mudanças feitas pelo assistente. Reabra o projeto se não mostrar.
+
 ## Compilar
 
 ```sh
