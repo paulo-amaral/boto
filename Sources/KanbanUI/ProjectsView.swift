@@ -17,6 +17,7 @@ public struct ProjectsView: View {
     @State private var showGitHub = false
     @State private var showImport = false
     @State private var showDeleted = false
+    @State private var changingIcon: Project?
     @Environment(\.openWindow) private var openWindow
     @State private var fileVault = SystemSecurity.FileVaultState.unknown
     @State private var fileVaultNoticeDismissed = false
@@ -85,7 +86,7 @@ public struct ProjectsView: View {
         .task(id: projects.count) { ProjectIcons.assignMissing(to: projects) }
         .task { fileVault = await Task.detached { SystemSecurity.fileVaultState() }.value }
         .modifier(ProjectSheets(
-            showHelp: $showHelp, showGitHub: $showGitHub, showImport: $showImport, showDeleted: $showDeleted,
+            showHelp: $showHelp, showGitHub: $showGitHub, showImport: $showImport, showDeleted: $showDeleted, changingIcon: $changingIcon,
             renaming: $renaming, deleting: $deleting, selectedId: $selectedId
         ))
     }
@@ -209,11 +210,10 @@ public struct ProjectsView: View {
         let isSelected = project.publicId == selected?.publicId
         return HStack(spacing: 8) {
             if isCollapsed {
-                Image(systemName: project.icon)
-                    .font(.system(size: 17))
+                ProjectIconView(icon: project.icon, size: 17)
                     .frame(maxWidth: .infinity, minHeight: 28)
             } else {
-                Image(systemName: project.icon)
+                ProjectIconView(icon: project.icon)
                     .foregroundStyle(Theme.muted)
                 Text(project.name).font(Theme.font(13)).lineLimit(1)
                 Spacer()
@@ -234,6 +234,7 @@ public struct ProjectsView: View {
             ProjectActions(entries: ProjectMenu.entries(
                 for: project,
                 onRename: { renaming = project },
+                onChangeIcon: { changingIcon = project },
                 onChooseRoot: { chooseRoot(for: project) },
                 onDelete: { deleting = project }
             ))
@@ -341,6 +342,7 @@ private struct ProjectSheets: ViewModifier {
     @Binding var showGitHub: Bool
     @Binding var showImport: Bool
     @Binding var showDeleted: Bool
+    @Binding var changingIcon: Project?
     @Binding var renaming: Project?
     @Binding var deleting: Project?
     @Binding var selectedId: String
@@ -351,6 +353,7 @@ private struct ProjectSheets: ViewModifier {
             .sheet(isPresented: $showGitHub) { GitHubSettingsSheet() }
             .sheet(isPresented: $showImport) { ImportSheet { selectedId = $0.publicId } }
             .sheet(isPresented: $showDeleted) { RecentlyDeletedView() }
+            .sheet(item: $changingIcon) { ProjectIconPicker(project: $0) }
             .sheet(item: $renaming) { RenameProjectSheet(project: $0) }
             .confirmationDialog(
                 "Delete \"\(deleting?.name ?? "")\"?",

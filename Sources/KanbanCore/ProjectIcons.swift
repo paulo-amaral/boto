@@ -4,6 +4,13 @@ import Foundation
 public enum ProjectIcons {
     public static let `default` = "rectangle.split.3x1"
 
+    /// An icon the person picked from the bundled Lucide set is stored as "lucide:<name>". Anything else is an SF Symbol.
+    public static let lucidePrefix = "lucide:"
+    public static func lucideIcon(_ name: String) -> String { lucidePrefix + name }
+    public static func lucideName(in icon: String) -> String? {
+        icon.hasPrefix(lucidePrefix) ? String(icon.dropFirst(lucidePrefix.count)) : nil
+    }
+
     public static let all: [String] = [
         "rectangle.split.3x1", "folder", "briefcase", "building.2", "person.2", "globe",
         "doc.text", "chart.bar", "chart.pie", "calendar", "tray.full", "paperplane",

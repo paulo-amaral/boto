@@ -15,6 +15,22 @@ final class ProjectIconTests: XCTestCase {
         }
     }
 
+    func testLucideIconsAreTellableFromSFSymbols() {
+        XCTAssertEqual(ProjectIcons.lucideIcon("briefcase"), "lucide:briefcase")
+        XCTAssertEqual(ProjectIcons.lucideName(in: "lucide:briefcase"), "briefcase")
+        XCTAssertNil(ProjectIcons.lucideName(in: "briefcase"))
+        XCTAssertNil(ProjectIcons.lucideName(in: ProjectIcons.default))
+    }
+
+    func testAssigningSkipsNothingWhenAProjectKeepsAPickedLucideIcon() {
+        let picked = project("A", secondsAgo: 20)
+        picked.iconName = ProjectIcons.lucideIcon("rocket")
+        let other = project("B", secondsAgo: 10)
+        ProjectIcons.assignMissing(to: [picked, other])
+        XCTAssertEqual(picked.iconName, "lucide:rocket", "a picked icon is never replaced")
+        XCTAssertEqual(other.iconName, ProjectIcons.all.first)
+    }
+
     func testIconsAreUniqueAndIncludeTheDefault() {
         XCTAssertEqual(Set(ProjectIcons.all).count, ProjectIcons.all.count)
         XCTAssertTrue(ProjectIcons.all.contains(ProjectIcons.default))

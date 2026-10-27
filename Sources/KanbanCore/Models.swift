@@ -26,7 +26,7 @@ public final class Project {
     public var archivedAt: Date?
     /// Set when starred; also orders the favourites.
     public var favoritedAt: Date?
-    /// SF Symbol name; nil means the default icon.
+    /// SF Symbol name, or "lucide:<name>" for a Lucide icon; nil means the default icon.
     public var iconName: String?
     @Relationship(deleteRule: .cascade, inverse: \Board.project) public var boards: [Board] = []
     /// Time logged on the project itself, for work that has no card.

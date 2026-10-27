@@ -16,6 +16,7 @@ rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp "$bin" "$app/Contents/MacOS/Boto"
 cp -R "$root/Resources/Fonts" "$app/Contents/Resources/Fonts"
+cp -R "$root/Resources/Lucide" "$app/Contents/Resources/Lucide"
 
 iconset="$root/build/AppIcon.iconset"
 rm -rf "$iconset"
