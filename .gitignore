@@ -1,0 +1,47 @@
+# Build output
+.build/
+.swiftpm/
+build/
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+.DS_Store
+
+# User data: the app stores boards, backups and exports on the user's machine, never in the repository
+*.store
+*.store-shm
+*.store-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+Backups/
+*.csv
+
+# Secrets and signing material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.mobileprovision
+*.provisionprofile
+*.keychain
+*.keychain-db
+id_rsa*
+id_ed25519*
+secrets.*
+credentials*.json
+
+# Local tooling, agent configuration and caches
+.claude/
+.kilo/
+.impeccable/
+.vscode/
+.idea/
+*.log
+*.swp
+*.profraw
