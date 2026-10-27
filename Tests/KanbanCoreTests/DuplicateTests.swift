@@ -57,8 +57,11 @@ final class DuplicateTests: XCTestCase {
         XCTAssertEqual(card.dueTimeMinutes, 600)
         XCTAssertEqual(card.colorHex, "#22c55e")
         XCTAssertEqual(card.importance, .high)
-        XCTAssertEqual(card.checklists.first?.items.map(\.title), ["Export", "Compare"])
-        XCTAssertEqual(card.checklists.first?.items.map(\.completed), [true, false])
+        // A to-many relationship has no order of its own after a save; the app sorts by `index`, and so does the test.
+        let items = try XCTUnwrap(card.checklists.first).items.sorted { $0.index < $1.index }
+        XCTAssertEqual(items.map(\.title), ["Export", "Compare"])
+        XCTAssertEqual(items.map(\.completed), [true, false])
+        XCTAssertEqual(items.map(\.index), [0, 1])
         XCTAssertEqual(card.references.map(\.displayPath), ["/Clients/Northwind/ledger.xlsx"])
     }
 
