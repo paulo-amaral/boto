@@ -75,6 +75,7 @@ Todas as capturas usam dados fictícios.
 
 ## Recursos
 
+- **Ícones:** escolha o ícone de cada projeto entre cerca de 1.900 do Lucide, com busca por nome ou tema.
 - **Quadros:** projetos, quadros, listas e cartões com etiquetas, cores, checklists, datas e descrição em Markdown. Arrastar e soltar, seleção múltipla, arquivar, agrupar por importância, filtros, busca e paleta de comandos.
 - **Referências:** arquivos e pastas locais, notas do Obsidian, issues e pull requests do GitHub e mensagens do Mail. O Boto guarda apenas ponteiros e nunca copia nem altera seus arquivos.
 - **Importação:** Trello e GitHub.
@@ -106,4 +107,4 @@ open build/Boto.app
 
 ## Licença
 
-[GNU AGPL-3.0](LICENSE). A fonte Plus Jakarta Sans segue a SIL Open Font License 1.1.
+[GNU AGPL-3.0](LICENSE). A fonte Plus Jakarta Sans segue a SIL Open Font License 1.1. Os ícones de projeto vêm do [Lucide](https://lucide.dev), sob a licença ISC (`Resources/Lucide/LICENSE`).

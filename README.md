@@ -76,6 +76,7 @@ All screenshots use made-up sample data.
 ## Features
 
 **Boards**
+- Pick each project's icon from about 1,900 Lucide icons, with search by name or topic.
 - Projects, boards, lists and cards with labels, colours, checklists, due dates and a Markdown description.
 - Drag and drop between lists. Command-click to select several cards. Archive instead of delete.
 - Group by importance (High, Medium, Low), filter by label, list or due date, search, and a command palette.
@@ -139,4 +140,4 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) first. Report vulnerabilities privately 
 
 ## Credits and licence
 
-Boto is licensed under the [GNU AGPL-3.0](LICENSE). It takes ideas from Trello and Kanbana. The interface font is Plus Jakarta Sans, under the SIL Open Font License 1.1 (`Resources/Fonts/OFL.txt`).
+Boto is licensed under the [GNU AGPL-3.0](LICENSE). It takes ideas from Trello and Kanbana. The interface font is Plus Jakarta Sans, under the SIL Open Font License 1.1 (`Resources/Fonts/OFL.txt`). Project icons come from [Lucide](https://lucide.dev), under the ISC licence (`Resources/Lucide/LICENSE`).
