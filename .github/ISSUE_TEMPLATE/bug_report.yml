@@ -1,0 +1,21 @@
+name: Bug report
+description: Something in Boto does not work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not paste real board contents, client names, tokens or personal information. Use placeholders.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected and what you got.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Boto version and macOS version
+      placeholder: "0.1.0, macOS 14.6"
+    validations:
+      required: true

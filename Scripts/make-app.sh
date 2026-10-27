@@ -5,8 +5,11 @@ set -euo pipefail
 root="${0:A:h:h}"
 cd "$root"
 
-swift build
-bin="$(swift build --show-bin-path)/Boto"
+# CONFIG=release and VERSION=1.2.3 are for release builds; the defaults suit local use.
+config="${CONFIG:-debug}"
+version="${VERSION:-0.1.0}"
+swift build -c "$config"
+bin="$(swift build -c "$config" --show-bin-path)/Boto"
 
 app="$root/build/Boto.app"
 rm -rf "$app"
@@ -45,6 +48,8 @@ cat > "$app/Contents/Info.plist" <<'PLIST'
 </dict>
 </plist>
 PLIST
+
+plutil -replace CFBundleShortVersionString -string "$version" "$app/Contents/Info.plist"
 
 codesign --force --options runtime --entitlements "$root/Resources/Boto.entitlements" --sign - "$app" >/dev/null
 echo "$app"
