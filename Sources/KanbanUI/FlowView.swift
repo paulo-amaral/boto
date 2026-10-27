@@ -130,7 +130,7 @@ struct FlowView: View {
                                     .foregroundStyle(by: .value("Stage", "Not started"))
                             }
                         }
-                        .chartForegroundStyleScale(["Done": Color(hex: "#4bce97"), "In progress": Color(hex: "#6c8cff"), "Not started": Theme.border])
+                        .chartForegroundStyleScale(["Done": Theme.success, "In progress": Theme.info, "Not started": Theme.border])
                         .frame(height: 140)
                         Text("A band that keeps widening means work is piling up in that stage.")
                             .font(Theme.font(11)).foregroundStyle(Theme.muted)

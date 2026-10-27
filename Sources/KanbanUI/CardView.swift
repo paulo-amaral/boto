@@ -63,7 +63,7 @@ public struct CardView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 if card.isCompleted {
-                    Image(systemName: "checkmark.circle.fill").font(.system(size: 12)).foregroundStyle(Color(hex: "#4bce97"))
+                    Image(systemName: "checkmark.circle.fill").font(.system(size: 12)).foregroundStyle(Theme.success)
                 }
                 Text(card.title)
                     .font(Theme.font(12))
@@ -108,7 +108,7 @@ public struct CardView: View {
                     if card.totalSeconds() > 0 {
                         Label(TimeReport.clock(card.totalSeconds()), systemImage: card.runningTimer == nil ? "hourglass" : "timer")
                             .font(Theme.font(11))
-                            .foregroundStyle(card.runningTimer == nil ? Theme.muted : Color(hex: "#6c8cff"))
+                            .foregroundStyle(card.runningTimer == nil ? Theme.muted : Theme.info)
                             .fixedSize()
                     }
                     let progress = card.checklistProgress

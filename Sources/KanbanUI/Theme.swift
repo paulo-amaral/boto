@@ -29,12 +29,30 @@ public enum Theme {
     public static let defaultLabel = "#3730a3"
     public static let overdue = Color(red: 0.97, green: 0.44, blue: 0.44)
 
+    /// Status colours as hex, so a test can check each against every surface (4.5:1 or better).
+    enum StatusHex {
+        static let danger = "#f87168"
+        static let warning = "#f5cd47"
+        static let success = "#4bce97"
+        /// One blue for progress, a running timer and links, so the same meaning never has two shades.
+        static let info = "#579dff"
+        /// Fill and text of the white primary button and of text on light label colours.
+        static let onLight = "#161616"
+        static let light = "#ffffff"
+    }
+    public static let danger = Color(hex: StatusHex.danger)
+    public static let warning = Color(hex: StatusHex.warning)
+    public static let success = Color(hex: StatusHex.success)
+    public static let info = Color(hex: StatusHex.info)
+    public static let onLight = Color(hex: StatusHex.onLight)
+    public static let light = Color(hex: StatusHex.light)
+
     /// Same hues as the board's other status colours: red, gold and blue read on every surface.
     public static func importanceColor(_ importance: Importance) -> Color {
         switch importance {
-        case .high: Color(hex: "#f87168")
-        case .medium: Color(hex: "#f5cd47")
-        case .low: Color(hex: "#579dff")
+        case .high: danger
+        case .medium: warning
+        case .low: info
         case .unset: muted
         }
     }

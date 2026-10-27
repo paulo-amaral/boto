@@ -493,7 +493,7 @@ private struct EntryEditRow: View {
     var body: some View {
         HStack(spacing: 8) {
             if entry.isRunning {
-                Text("running").font(Theme.font(12)).foregroundStyle(Color(hex: "#6c8cff")).frame(width: 64, alignment: .leading)
+                Text("running").font(Theme.font(12)).foregroundStyle(Theme.info).frame(width: 64, alignment: .leading)
                 Button("Stop") { entry.stop() }
             } else {
                 TextField("0:00", text: $text)

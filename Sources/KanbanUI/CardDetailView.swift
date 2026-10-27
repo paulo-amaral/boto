@@ -23,7 +23,7 @@ struct CardDetailView: View {
     private var projectRoot: URL? { board?.project?.rootFolderURL }
 
     /// Accent of the list button, the gold of Trello's list pill.
-    private let accent = Color(hex: "#f5cd47")
+    private let accent = Theme.warning
 
     /// The card lives in its own window, so closing means closing that window.
     private func closeWindow() { NSApp.keyWindow?.performClose(nil) }
@@ -166,7 +166,7 @@ struct CardDetailView: View {
             Button { card.setCompleted(!card.isCompleted) } label: {
                 Image(systemName: card.isCompleted ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 24))
-                    .foregroundStyle(card.isCompleted ? Color(hex: "#4bce97") : Theme.muted)
+                    .foregroundStyle(card.isCompleted ? Theme.success : Theme.muted)
             }
             .buttonStyle(.plain)
             .padding(.top, 5)
@@ -565,7 +565,7 @@ private struct LabelChip: View {
         let hex = label.colourCode ?? Theme.defaultLabel
         Text(label.name)
             .font(Theme.font(13, weight: .semibold))
-            .foregroundStyle(ColorContrast.prefersLightText(onHex: hex) ? Color.white : Color(hex: "#161616"))
+            .foregroundStyle(ColorContrast.prefersLightText(onHex: hex) ? Theme.light : Theme.onLight)
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
             .background(RoundedRectangle(cornerRadius: 4).fill(Color(hex: hex)))
@@ -609,7 +609,7 @@ private struct EventRow: View {
         HStack(alignment: .top, spacing: 10) {
             Text(CurrentUser.initials)
                 .font(Theme.font(13, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(Theme.light)
                 .frame(width: 32, height: 32)
                 .background(Circle().fill(Color(hex: Theme.defaultLabel)))
             VStack(alignment: .leading, spacing: 4) {
@@ -618,7 +618,7 @@ private struct EventRow: View {
                 Text(event.createdAt.formatted(.relative(presentation: .named)))
                     .font(Theme.font(12))
                     .underline()
-                    .foregroundStyle(Color(hex: "#579dff"))
+                    .foregroundStyle(Theme.info)
                 if event.kind == .comment {
                     Text(event.text)
                         .font(Theme.font(14))
@@ -687,7 +687,7 @@ struct ChecklistSection: View {
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
                         Capsule().fill(Theme.card)
-                        Capsule().fill(progress == 1 ? Color(hex: "#4bce97") : Color(hex: "#579dff"))
+                        Capsule().fill(progress == 1 ? Theme.success : Theme.info)
                             .frame(width: geo.size.width * progress)
                     }
                 }

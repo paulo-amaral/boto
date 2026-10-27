@@ -110,8 +110,8 @@ struct ToolbarButtonStyle: ButtonStyle {
             .font(Theme.font(13, weight: .semibold))
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .foregroundStyle(primary ? Color.black : Theme.text)
-            .background(RoundedRectangle(cornerRadius: Theme.cornerRadius).fill(primary ? Color.white : Theme.background))
+            .foregroundStyle(primary ? Theme.onLight : Theme.text)
+            .background(RoundedRectangle(cornerRadius: Theme.cornerRadius).fill(primary ? Theme.light : Theme.background))
             .overlay(RoundedRectangle(cornerRadius: Theme.cornerRadius).strokeBorder(primary ? .clear : (active ? Theme.mutedStrong : Theme.card)))
             .opacity(configuration.isPressed ? 0.8 : 1)
     }
