@@ -38,20 +38,13 @@ struct ProjectIconPicker: View {
                 message("No icon matches \"\(query)\".")
             } else {
                 ScrollView {
-                    LazyVGrid(columns: columns, spacing: 6) {
-                        ForEach(names, id: \.self) { name in
-                            let icon = ProjectIcons.lucideIcon(name)
-                            Button { project.iconName = icon } label: {
-                                ProjectIconView(icon: icon, size: 20)
-                                    .frame(width: 40, height: 40)
-                                    .background(project.icon == icon ? Theme.border : Theme.card,
-                                                in: RoundedRectangle(cornerRadius: Theme.cornerRadius))
-                            }
-                            .buttonStyle(.plain)
-                            .help(name)
-                            .accessibilityLabel(name)
-                            .accessibilityAddTraits(project.icon == icon ? .isSelected : [])
+                    VStack(alignment: .leading, spacing: 16) {
+                        if query.trimmingCharacters(in: .whitespaces).isEmpty {
+                            Text("Suggested").font(Theme.font(13, weight: .semibold))
+                            grid(LucideIcons.suggested)
+                            Text("All icons").font(Theme.font(13, weight: .semibold))
                         }
+                        grid(names)
                     }
                     .padding(.horizontal, 22)
                 }
@@ -64,6 +57,24 @@ struct ProjectIconPicker: View {
         .foregroundStyle(Theme.text)
         .background(Theme.background)
         .preferredColorScheme(.dark)
+    }
+
+    private func grid(_ names: [String]) -> some View {
+        LazyVGrid(columns: columns, spacing: 6) {
+            ForEach(names, id: \.self) { name in
+                let icon = ProjectIcons.lucideIcon(name)
+                Button { project.iconName = icon } label: {
+                    ProjectIconView(icon: icon, size: 20)
+                        .frame(width: 40, height: 40)
+                        .background(project.icon == icon ? Theme.border : Theme.card,
+                                    in: RoundedRectangle(cornerRadius: Theme.cornerRadius))
+                }
+                .buttonStyle(.plain)
+                .help(name)
+                .accessibilityLabel(name)
+                .accessibilityAddTraits(project.icon == icon ? .isSelected : [])
+            }
+        }
     }
 
     private func message(_ text: String) -> some View {

@@ -30,6 +30,17 @@ enum LucideIcons {
         return loaded
     }
 
+    /// Icons for the work this app is for, shown before the full list. Names missing from the set are skipped.
+    static var suggested: [String] {
+        let wanted = """
+        briefcase briefcase-business building landmark handshake users user-round chart-column chart-line chart-pie wallet \
+        banknote receipt calculator file-text folders folder-open clipboard-list calendar clock target flag rocket lightbulb \
+        graduation-cap book-open globe map megaphone mail phone message-square shield-check lock settings wrench hammer house \
+        heart star leaf plane truck shopping-cart stethoscope scale scroll bookmark tag layout-dashboard kanban list-checks
+        """
+        return wanted.split(whereSeparator: { $0 == " " || $0 == "\n" }).map(String.init).filter { file?.icons[$0] != nil }
+    }
+
     static var isAvailable: Bool { file != nil }
     static var version: String? { file?.version }
     static var names: [String] { file.map { $0.icons.keys.sorted() } ?? [] }

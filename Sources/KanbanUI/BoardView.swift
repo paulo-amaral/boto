@@ -163,6 +163,7 @@ public struct BoardView: View {
     @Bindable var board: Board
     let onChooseRoot: () -> Void
     let onDelete: () -> Void
+    let onChangeIcon: (() -> Void)?
     @State private var filter = CardFilter()
     @State private var selection: Set<String> = []
     @State private var showArchived = false
@@ -180,10 +181,11 @@ public struct BoardView: View {
         board.orderedLists.flatMap(\.orderedCards).filter { selection.contains($0.publicId) }
     }
 
-    public init(board: Board, onChooseRoot: @escaping () -> Void, onDelete: @escaping () -> Void) {
+    public init(board: Board, onChooseRoot: @escaping () -> Void, onDelete: @escaping () -> Void, onChangeIcon: (() -> Void)? = nil) {
         self.board = board
         self.onChooseRoot = onChooseRoot
         self.onDelete = onDelete
+        self.onChangeIcon = onChangeIcon
     }
 
     public var body: some View {
@@ -324,7 +326,7 @@ public struct BoardView: View {
         entries.append(DropdownEntry(icon: "calendar.badge.plus", title: "Add dated cards to Apple Calendar", action: addDatedCardsToCalendar))
         if let project = board.project {
             entries.append(.divider)
-            entries += ProjectMenu.entries(for: project, onChooseRoot: onChooseRoot, onDelete: onDelete)
+            entries += ProjectMenu.entries(for: project, onChangeIcon: onChangeIcon, onChooseRoot: onChooseRoot, onDelete: onDelete)
         }
         return entries
     }

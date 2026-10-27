@@ -249,7 +249,8 @@ public struct ProjectsView: View {
             BoardView(
                 board: board,
                 onChooseRoot: { chooseRoot(for: project) },
-                onDelete: { deleting = project }
+                onDelete: { deleting = project },
+                onChangeIcon: { changingIcon = project }
             )
                 .id(board.publicId)
         } else {

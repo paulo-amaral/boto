@@ -31,6 +31,14 @@ final class LucideIconsTests: XCTestCase {
         }
     }
 
+    func testSuggestedIconsAreMostlyRealAndNeverRepeat() {
+        let suggested = LucideIcons.suggested
+        XCTAssertGreaterThan(suggested.count, 40)
+        XCTAssertEqual(Set(suggested).count, suggested.count)
+        XCTAssertTrue(suggested.allSatisfy { LucideIcons.names.contains($0) })
+        XCTAssertTrue(suggested.contains("briefcase"))
+    }
+
     func testAnUnknownNameGivesNoImage() {
         XCTAssertNil(LucideIcons.image("not-an-icon"))
     }
