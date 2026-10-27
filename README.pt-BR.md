@@ -52,6 +52,10 @@ Todas as capturas usam dados fictícios.
   <img src="docs/images/hours.png" alt="Folha de horas semanal do Boto por tarefa e dia, com totais" width="80%">
 </p>
 
+<p align="center">
+  <img src="docs/images/report.png" alt="Relatório de horas do Boto por dia e por cartão, com todos os lançamentos" width="60%">
+</p>
+
 ## Recursos
 
 - **Quadros:** projetos, quadros, listas e cartões com etiquetas, cores, checklists, datas e descrição em Markdown. Arrastar e soltar, seleção múltipla, arquivar, agrupar por importância, filtros, busca e paleta de comandos.

@@ -52,6 +52,10 @@ All screenshots use made-up sample data.
   <img src="docs/images/hours.png" alt="Boto weekly timesheet by task and day with totals" width="80%">
 </p>
 
+<p align="center">
+  <img src="docs/images/report.png" alt="Boto hours report by day and by card, with every entry listed" width="60%">
+</p>
+
 ## Features
 
 **Boards**
