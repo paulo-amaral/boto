@@ -17,6 +17,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 - Commit subjects follow Conventional Commits, checked by a hook and by CI on pull requests.
 - README grouped by topic, with new screenshots of the full Hours window and report.
 - Status colours (done, in progress, warning, danger) live in the theme, and progress and a running timer use one blue.
+- The card title is smaller (20 pt, semibold), in proportion to the text around it.
+- Help has an AI assistants topic with the command that connects the MCP server.
 - Deleting a list or a card asks first, and the list prompt says how many cards go with it.
 
 ### Fixed
