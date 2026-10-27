@@ -118,4 +118,4 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) first. Report vulnerabilities privately 
 
 ## Credits and licence
 
-Boto is licensed under the [GNU AGPL-3.0](LICENSE). It draws on [Kan](https://github.com/kanbn/kan) (AGPL-3.0) for its layout and logic, and takes ideas from Trello and Kanbana. The interface font is Plus Jakarta Sans, under the SIL Open Font License 1.1 (`Resources/Fonts/OFL.txt`).
+Boto is licensed under the [GNU AGPL-3.0](LICENSE). It takes ideas from Trello and Kanbana. The interface font is Plus Jakarta Sans, under the SIL Open Font License 1.1 (`Resources/Fonts/OFL.txt`).

@@ -85,4 +85,4 @@ open build/Boto.app
 
 ## Licença
 
-[GNU AGPL-3.0](LICENSE). O Boto usa o [Kan](https://github.com/kanbn/kan) (AGPL-3.0) como base de layout e lógica. A fonte Plus Jakarta Sans segue a SIL Open Font License 1.1.
+[GNU AGPL-3.0](LICENSE). A fonte Plus Jakarta Sans segue a SIL Open Font License 1.1.
