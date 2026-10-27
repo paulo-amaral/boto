@@ -17,7 +17,7 @@ git config core.hooksPath .githooks
 swift test
 ```
 
-The hooks block commits that contain secrets or local data files, and add a sequential number to each commit subject (`#12 Fix the card footer`). A subject that already starts with `#<number>` is left as it is.
+The hooks block commits that contain secrets or local data files, and reject a commit subject that does not follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/): `type(scope): description`, at most 72 characters, for example `fix(calendar): remove the event when a card is archived`. Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`. Use `!` after the type for a breaking change. Merge, revert, fixup and squash subjects made by git pass.
 
 ## Pull requests
 
