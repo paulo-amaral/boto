@@ -39,21 +39,38 @@ Boto is a Kanban board for one person. Projects hold boards, boards hold lists, 
 
 All screenshots use made-up sample data.
 
+### Board
+
 <p align="center">
   <img src="docs/images/board.png" alt="Boto Kanban board with four lists, labels, due dates, a blocked card and a WIP limit" width="100%">
+  <br><sub>Lists with labels, due dates, a blocked card and a WIP limit.</sub>
+</p>
+
+### Card and flow
+
+<table align="center">
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/images/card.png" alt="Boto card with importance, label, due date, description and a checklist at 50 percent">
+      <br><sub>A card: importance, label, due date, description and steps.</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/images/flow.png" alt="Boto flow metrics: cycle time, Kaizen experiment, throughput and cumulative flow">
+      <br><sub>Flow: cycle time, a Kaizen experiment, throughput and cumulative flow.</sub>
+    </td>
+  </tr>
+</table>
+
+### Hours
+
+<p align="center">
+  <img src="docs/images/hours-timesheet.png" alt="Boto weekly timesheet by task and day with totals" width="90%">
+  <br><sub>Weekly timesheet by task and day.</sub>
 </p>
 
 <p align="center">
-  <img src="docs/images/card.png" alt="Boto card with importance, label, due date, description and a checklist at 50 percent" width="38%">
-  <img src="docs/images/flow.png" alt="Boto flow metrics: cycle time, Kaizen experiment, throughput and cumulative flow" width="38%">
-</p>
-
-<p align="center">
-  <img src="docs/images/hours.png" alt="Boto weekly timesheet by task and day with totals" width="80%">
-</p>
-
-<p align="center">
-  <img src="docs/images/report.png" alt="Boto hours report by day and by card, with every entry listed" width="60%">
+  <img src="docs/images/hours-report.png" alt="Boto hours report by day and by card, with every entry listed" width="55%">
+  <br><sub>Report by period, by day, by card and by entry.</sub>
 </p>
 
 ## Features
@@ -98,7 +115,7 @@ Requires macOS 14 or later.
 ```sh
 git clone https://github.com/paulo-amaral/boto.git
 cd boto
-git config core.hooksPath .githooks   # secret scan and commit numbering
+git config core.hooksPath .githooks   # secret scan and Conventional Commits check
 swift test                            # run the tests
 ./Scripts/make-app.sh                 # build/Boto.app
 open build/Boto.app

@@ -39,21 +39,38 @@ O Boto é um quadro Kanban para uma pessoa. Projetos têm quadros, quadros têm 
 
 Todas as capturas usam dados fictícios.
 
+### Quadro
+
 <p align="center">
   <img src="docs/images/board.png" alt="Quadro Kanban do Boto com quatro listas, etiquetas, datas, um cartão bloqueado e limite de WIP" width="100%">
+  <br><sub>Listas com etiquetas, datas, um cartão bloqueado e limite de WIP.</sub>
+</p>
+
+### Cartão e fluxo
+
+<table align="center">
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/images/card.png" alt="Cartão do Boto com importância, etiqueta, data, descrição e checklist em 50 por cento">
+      <br><sub>Um cartão: importância, etiqueta, data, descrição e passos.</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/images/flow.png" alt="Métricas de fluxo do Boto: tempo de ciclo, experimento Kaizen, vazão e fluxo acumulado">
+      <br><sub>Fluxo: tempo de ciclo, experimento Kaizen, vazão e fluxo acumulado.</sub>
+    </td>
+  </tr>
+</table>
+
+### Horas
+
+<p align="center">
+  <img src="docs/images/hours-timesheet.png" alt="Folha de horas semanal do Boto por tarefa e dia, com totais" width="90%">
+  <br><sub>Folha de horas semanal por tarefa e dia.</sub>
 </p>
 
 <p align="center">
-  <img src="docs/images/card.png" alt="Cartão do Boto com importância, etiqueta, data, descrição e checklist em 50 por cento" width="38%">
-  <img src="docs/images/flow.png" alt="Métricas de fluxo do Boto: tempo de ciclo, experimento Kaizen, vazão e fluxo acumulado" width="38%">
-</p>
-
-<p align="center">
-  <img src="docs/images/hours.png" alt="Folha de horas semanal do Boto por tarefa e dia, com totais" width="80%">
-</p>
-
-<p align="center">
-  <img src="docs/images/report.png" alt="Relatório de horas do Boto por dia e por cartão, com todos os lançamentos" width="60%">
+  <img src="docs/images/hours-report.png" alt="Relatório de horas do Boto por dia e por cartão, com todos os lançamentos" width="55%">
+  <br><sub>Relatório por período, por dia, por cartão e por lançamento.</sub>
 </p>
 
 ## Recursos
@@ -81,7 +98,7 @@ Requer macOS 14 ou superior.
 ```sh
 git clone https://github.com/paulo-amaral/boto.git
 cd boto
-git config core.hooksPath .githooks   # varredura de segredos e numeração de commits
+git config core.hooksPath .githooks   # varredura de segredos e checagem de Conventional Commits
 swift test
 ./Scripts/make-app.sh
 open build/Boto.app
