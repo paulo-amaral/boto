@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Dot grid from Kan's `PatternedBackground.tsx`: 14.42 pt pitch, 0.45 pt radius, #3e3e3e, origin (10, 10).
+/// Dot grid: 14.42 pt pitch, 0.45 pt radius, #3e3e3e, origin (10, 10).
 struct PatternedBackground: View {
     var body: some View {
         Canvas { context, size in
@@ -99,7 +99,7 @@ extension View {
     func rowHighlight(selected: Bool = false) -> some View { modifier(HoverHighlight(selected: selected)) }
 }
 
-/// Header buttons: white primary ("New list") and bordered secondary ("Filter"), as in the Kan board header.
+/// Header buttons: white primary ("New list") and bordered secondary ("Filter").
 struct ToolbarButtonStyle: ButtonStyle {
     let primary: Bool
     /// A toggle that is switched on gets a lighter outline.

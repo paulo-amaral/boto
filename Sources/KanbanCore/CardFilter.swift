@@ -1,6 +1,6 @@
 import Foundation
 
-/// Same keys and ranges as Kan's `packages/shared/src/utils/dueDateFilters.ts`; ranges are [start, end).
+/// Ranges are [start, end).
 public enum DueDateFilter: String, CaseIterable, Sendable {
     case overdue, today, tomorrow, nextWeek, nextMonth, noDueDate
 
@@ -30,7 +30,7 @@ public enum DueDateFilter: String, CaseIterable, Sendable {
     }
 }
 
-/// Groups are ANDed; inside a group any selected value matches (OR), like Kan's board filters.
+/// Groups are ANDed; inside a group any selected value matches (OR).
 public struct CardFilter: Equatable {
     public var labelIds: Set<String> = []
     public var listIds: Set<String> = []

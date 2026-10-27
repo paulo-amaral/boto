@@ -2,9 +2,8 @@ import AppKit
 import KanbanCore
 import SwiftUI
 
-/// The project menu, after Kan's board menu (Edit board URL, Archive board, Add to favorites, Delete board).
-/// "Edit board URL" becomes the root folder, the closest thing a Boto project has to an address, and
-/// "Move to workspace" is left out because Boto has no workspaces.
+/// The project menu (root folder, archive, favorites, delete). The root folder is the closest thing a Boto
+/// project has to an address.
 enum ProjectMenu {
     static func entries(for project: Project, onRename: (() -> Void)? = nil,
                         onChooseRoot: @escaping () -> Void, onDelete: @escaping () -> Void) -> [DropdownEntry] {

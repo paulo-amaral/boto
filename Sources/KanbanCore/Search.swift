@@ -12,7 +12,7 @@ public enum SearchResult: Identifiable {
     }
 }
 
-/// Local counterpart of Kan's `workspace.search`: matches project names and card titles, descriptions and label names.
+/// Matches project names and card titles, descriptions and label names.
 public enum Search {
     public static func results(for query: String, in projects: [Project], limit: Int = 20) -> [SearchResult] {
         let needle = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()

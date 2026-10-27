@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 
-/// Short stable id, same idea as the 12-char `publicId` columns in Kan's schema.
+/// Short stable id.
 /// Stays constant across sync snapshots, unlike SwiftData's persistent identifier.
 func makePublicId() -> String {
     String(UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(12)).lowercased()
@@ -413,8 +413,8 @@ public enum ReferenceKind: String, Codable, Sendable {
     public var isRemote: Bool { isGitHub || self == .email }
 }
 
-/// Pointer to a local file, folder or Obsidian note. Replaces Kan's S3 attachments:
-/// nothing is copied. Resolution (bookmark, then root + relativePath, then displayPath) comes in phase 2.
+/// Pointer to a local file, folder or Obsidian note. Nothing is copied.
+/// Resolution (bookmark, then root + relativePath, then displayPath) comes in phase 2.
 @Model
 public final class Reference {
     @Attribute(.unique) public var publicId: String

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Reads a Trello board as returned by the Trello REST API (the shape Kan's importer uses).
+/// Reads a Trello board as returned by the Trello REST API.
 /// Every field is optional so a missing key never aborts the import. Whether the file produced by Trello's
 /// "Export as JSON" has exactly these keys is not confirmed by the documentation I read; check with a real export.
 public enum TrelloImporter {
@@ -10,7 +10,7 @@ public enum TrelloImporter {
         public var errorDescription: String? { "This file does not look like a Trello board export." }
     }
 
-    // Colour names from Kan's `packages/api/src/utils/trello.ts`.
+    // Trello colour names mapped to hex.
     private static let colours: [String: String] = [
         "green": "#4bce97", "yellow": "#f5cd47", "orange": "#fea362", "red": "#f87168", "purple": "#9f8fef",
         "blue": "#579dff", "sky": "#6cc3e0", "lime": "#94c748", "pink": "#e774bb", "black": "#8590a2",
@@ -79,7 +79,7 @@ public enum TrelloImporter {
             details: card.desc ?? "",
             due: card.due.flatMap(parseDate),
             labels: (card.labels ?? []).compactMap { label in
-                // Same rule as Kan's importer: labels without a name are dropped.
+                // Labels without a name are dropped.
                 guard let name = label.name, !name.isEmpty else { return nil }
                 return ImportedBoard.Label(name: name, colour: colour(for: label.color))
             },

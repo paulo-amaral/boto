@@ -14,7 +14,7 @@ struct DropdownEntry: Identifiable {
     static var divider: DropdownEntry { DropdownEntry(isDivider: true) }
 }
 
-/// The panel under the board's "..." button, after Kan's board menu: a dark rounded panel with an icon and a label
+/// The panel under the board's "..." button: a dark rounded panel with an icon and a label
 /// per row. A native macOS menu cannot be styled this way, and it hides icons unless asked.
 struct DropdownPanel: View {
     let entries: [DropdownEntry]

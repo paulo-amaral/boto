@@ -14,7 +14,7 @@ extension Color {
     }
 }
 
-/// Dark palette ported from Kan's `tooling/tailwind/web.ts` (dark-50 ... dark-1000).
+/// Dark palette (dark-50 ... dark-1000).
 public enum Theme {
     public static let background = Color(hex: "#161616")
     public static let list = Color(hex: "#1c1c1c")
@@ -22,7 +22,7 @@ public enum Theme {
     public static let cardHover = Color(hex: "#282828")
     public static let border = Color(hex: "#3e3e3e")
     public static let divider = Color(hex: "#2e2e2e")
-    /// 4.5:1 or better on list, card and hover surfaces (checked); Kan's #707070 was about 3.2:1 on cards.
+    /// 4.5:1 or better on list, card and hover surfaces (checked).
     public static let muted = Color(hex: "#8e8e8e")
     public static let mutedStrong = Color(hex: "#bbbbbb")
     public static let text = Color(hex: "#ededed")

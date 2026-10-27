@@ -1,7 +1,7 @@
 import KanbanCore
 import SwiftUI
 
-/// Groups mirror Kan's `Filters.tsx`: Labels, Lists, Due date, a count badge and "Clear filters".
+/// Groups: Labels, Lists, Due date, a count badge and "Clear filters".
 struct FilterButton: View {
     @Binding var filter: CardFilter
     let labels: [KanbanCore.Label]

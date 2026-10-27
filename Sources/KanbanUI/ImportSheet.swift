@@ -3,7 +3,7 @@ import SwiftData
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// "New import" dialog, after Kan's: pick a source, preview what will be created, then import as a new project.
+/// "New import" dialog: pick a source, preview what will be created, then import as a new project.
 struct ImportSheet: View {
     enum Source: String, CaseIterable, Identifiable {
         case trello = "Trello", github = "GitHub"

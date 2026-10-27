@@ -2,7 +2,7 @@ import AppKit
 import KanbanCore
 import SwiftUI
 
-/// Search dialog modelled on Kan's `CommandPallette.tsx`: 550 pt wide, input on top, icon + title + context rows.
+/// Search dialog: 550 pt wide, input on top, icon + title + context rows.
 struct CommandPalette: View {
     let projects: [Project]
     let onSelect: (SearchResult) -> Void

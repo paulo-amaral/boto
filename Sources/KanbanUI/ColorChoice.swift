@@ -14,7 +14,7 @@ extension Color {
 }
 
 public enum Palette {
-    /// Tailwind 500 shades, same family the Kan UI draws its label colours from.
+    /// Tailwind 500 shades.
     public static let swatches: [(name: String, hex: String)] = [
         ("Red", "#ef4444"), ("Orange", "#f97316"), ("Amber", "#f59e0b"), ("Lime", "#84cc16"),
         ("Green", "#22c55e"), ("Teal", "#14b8a6"), ("Cyan", "#06b6d4"), ("Blue", "#3b82f6"),

@@ -101,7 +101,7 @@ public struct ProjectsView: View {
 
     // MARK: Sidebar
 
-    /// Collapsible like Kan's `SideNavigation.tsx`: 256 pt with names, or a narrow rail with initials.
+    /// Collapsible: 256 pt with names, or a narrow rail with initials.
     private var sidebar: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
