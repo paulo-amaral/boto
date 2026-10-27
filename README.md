@@ -127,16 +127,16 @@ Add it to your assistant's MCP settings, with the path of the installed app:
 }
 ```
 
-Add `"args": ["--read-only"]` to let the assistant read but not change anything.
+The server only reads by default. Add `"args": ["--allow-writes"]` to let the assistant create and change cards.
 
-| Reading | Writing |
+| Reading | Writing (needs `--allow-writes`) |
 |---|---|
-| `list_projects`, `get_board`, `get_card`, `search`, `get_time_report` | `create_card`, `update_card`, `move_card`, `set_card_archived`, `add_checklist_item`, `set_checklist_item_completed`, `log_time` |
+| `list_projects`, `get_board`, `get_card`, `get_card_activity`, `list_labels`, `search`, `get_time_report` | `create_card`, `update_card`, `move_card`, `set_card_archived`, `add_checklist_item`, `set_checklist_item_completed`, `log_time` |
 
 - There is no delete tool. Deleting and restoring stay in the app, under Recently deleted.
 - A card that is on your Apple Calendar cannot be completed or archived from here, because that removes its event and only the app holds the calendar permission. Do it in the app.
 - Texts have length limits, ids are looked up, and a bad argument changes nothing.
-- What a tool returns goes to the assistant, and from there to the company that runs its model. Use `--read-only`, or do not connect it, for boards you cannot share.
+- What a tool returns goes to the assistant, and from there to the company that runs its model. Keep the read-only default, or do not connect it, for boards you cannot share.
 - Not checked: whether a Boto window that is already open shows changes made by the assistant right away. Reopen the project if it does not.
 
 ## Build from source

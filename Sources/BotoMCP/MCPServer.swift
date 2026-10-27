@@ -36,7 +36,8 @@ public final class MCPServer {
                 "capabilities": ["tools": [String: Any]()],
                 "serverInfo": ["name": "boto", "version": "0.2.0"],
                 "instructions": "Boto is a personal Kanban app. Ids come from list_projects, get_board and search. "
-                    + "Nothing is ever deleted through these tools; restore and delete happen in the app.",
+                    + "Nothing is ever deleted through these tools; restore and delete happen in the app. "
+                    + "When started without --allow-writes the server only reads, and the write tools are not listed.",
             ])
         case "ping":
             return result(id: id, [String: Any]())

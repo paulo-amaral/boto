@@ -7,7 +7,7 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 ## [0.2.0] - 2026-10-27
 
 ### Added
-- `boto-mcp`, an MCP server inside the app for AI assistants: read boards, cards and hours, and create, edit, move and archive cards, tick checklist items and log time. It has no delete tool and a `--read-only` mode.
+- `boto-mcp`, an MCP server inside the app for AI assistants: read boards, cards and hours, and create, edit, move and archive cards, tick checklist items and log time. It only reads unless started with `--allow-writes`, and it has no delete tool.
 - Project icons: pick one from the Lucide set (about 1,900, ISC licence) with search by name or topic, or leave it to Boto. In the sidebar, right-click a project and choose Change icon.
 - Recently deleted: a sidebar entry that lists deleted projects, lists and cards and restores each one. A list comes back with its cards.
 
@@ -20,7 +20,7 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 - Deleting a list or a card asks first, and the list prompt says how many cards go with it.
 
 ### Fixed
-- The Colour entry in a card's Add menu did nothing on a card that had no colour yet.
+- Colour could not be set on a new card. It is now a button of its own beside Labels and Dates.
 - A failed CSV export now says so instead of staying silent.
 - Icon-only buttons have spoken names, and cards, search results and project rows are announced as buttons.
 - The delete button in the hours report also appears with keyboard focus.

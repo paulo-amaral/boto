@@ -86,7 +86,7 @@ final class MCPServerTests: XCTestCase {
     func testReadOnlyHidesAndRefusesEveryWrite() throws {
         let (server, _, _, list) = try makeServer(readOnly: true)
         let names = try XCTUnwrap((try send(server, "tools/list")["result"] as? [String: Any])?["tools"] as? [[String: Any]]).compactMap { $0["name"] as? String }
-        XCTAssertEqual(Set(names), ["list_projects", "get_board", "get_card", "search", "get_time_report"])
+        XCTAssertEqual(Set(names), ["list_projects", "get_board", "get_card", "get_card_activity", "list_labels", "search", "get_time_report"])
         let reply = try send(server, "tools/call", ["name": "create_card", "arguments": ["list_id": list.publicId, "title": "x"]])
         XCTAssertNotNil(reply["error"], "a write tool does not exist in read-only mode")
         XCTAssertTrue(list.orderedCards.isEmpty)
@@ -173,6 +173,34 @@ final class MCPServerTests: XCTestCase {
         let report = try call(server, "get_time_report", ["project_id": project.publicId, "from": "2026-10-26", "to": "2026-10-27"])
         XCTAssertEqual(report.json["total"] as? String, "2:00")
         XCTAssertEqual(report.json["total_seconds"] as? Int, 7200)
+    }
+
+    func testActivityListsCommentsAndCanFilterToThem() throws {
+        let (server, _, _, list) = try makeServer()
+        let card = list.addCard(title: "A")
+        card.addComment("Waiting on the client")
+        card.setImportance(.high)
+        let all = try XCTUnwrap(try call(server, "get_card_activity", ["card_id": card.publicId]).json["activity"] as? [[String: Any]])
+        XCTAssertTrue(all.contains { $0["kind"] as? String == "created" })
+        XCTAssertTrue(all.contains { $0["kind"] as? String == "importanceChanged" })
+        let comments = try XCTUnwrap(try call(server, "get_card_activity", ["card_id": card.publicId, "comments_only": true]).json["activity"] as? [[String: Any]])
+        XCTAssertEqual(comments.map { $0["text"] as? String }, ["Waiting on the client"])
+        let limited = try XCTUnwrap(try call(server, "get_card_activity", ["card_id": card.publicId, "limit": 1]).json["activity"] as? [[String: Any]])
+        XCTAssertEqual(limited.count, 1, "the latest entry only")
+        XCTAssertTrue(try call(server, "get_card_activity", ["card_id": "nope"]).isError)
+    }
+
+    func testLabelsShowColourAndOpenCardCounts() throws {
+        let (server, _, board, list) = try makeServer()
+        let label = KanbanCore.Label(name: "Research", colourCode: "#3b82f6")
+        board.labels.append(label)
+        let open = list.addCard(title: "Open"); open.attach(label)
+        let archived = list.addCard(title: "Archived"); archived.attach(label); archived.setArchived(true)
+        let labels = try XCTUnwrap(try call(server, "list_labels", ["board_id": board.publicId]).json["labels"] as? [[String: Any]])
+        XCTAssertEqual(labels.first?["name"] as? String, "Research")
+        XCTAssertEqual(labels.first?["colour"] as? String, "#3b82f6")
+        XCTAssertEqual(labels.first?["open_cards"] as? Int, 1, "archived cards are not counted")
+        XCTAssertTrue(try call(server, "list_labels", ["board_id": "nope"]).isError)
     }
 
     func testSearchFindsCardsAcrossProjects() throws {

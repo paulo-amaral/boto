@@ -53,6 +53,12 @@ final class BotoTools {
         ToolDefinition(name: "search", description: "Find projects and cards by name, title, description or label.",
                        properties: ["query": text("Text to look for."), "limit": ["type": "integer", "description": "At most this many results (1 to 50, default 20)."]],
                        required: ["query"], writes: false),
+        ToolDefinition(name: "get_card_activity", description: "A card's activity feed, oldest first: comments, moves, label and date changes. Use comments_only for just the comments.",
+                       properties: ["card_id": text("Card id."), "comments_only": flag("Only comments."),
+                                    "limit": ["type": "integer", "description": "The latest this many entries (1 to 200, default 50)."]],
+                       required: ["card_id"], writes: false),
+        ToolDefinition(name: "list_labels", description: "The labels of a board, with their colour and how many open cards carry each.",
+                       properties: ["board_id": text("Board id.")], required: ["board_id"], writes: false),
         ToolDefinition(name: "get_time_report", description: "Hours logged on a project between two dates, by day and by card.",
                        properties: ["project_id": text("Project id."), "from": text(day), "to": text(day)], required: ["project_id", "from", "to"], writes: false),
         ToolDefinition(name: "create_card", description: "Add a card at the end of a list.",
@@ -91,6 +97,8 @@ final class BotoTools {
         case "get_board": return try getBoard(arguments)
         case "get_card": return try getCard(arguments)
         case "search": return try search(arguments)
+        case "get_card_activity": return try cardActivity(arguments)
+        case "list_labels": return try listLabels(arguments)
         case "get_time_report": return try timeReport(arguments)
         case "create_card": return try createCard(arguments)
         case "update_card": return try updateCard(arguments)
@@ -159,6 +167,28 @@ final class BotoTools {
             case .card(let card): compact(["type": "card", "id": card.publicId, "title": card.title,
                                            "list": card.list?.name, "project": card.list?.board?.project?.name])
             }
+        }]
+    }
+
+    private func cardActivity(_ args: [String: Any]) throws -> Any {
+        let card = try findCard(try required(args, "card_id"))
+        let commentsOnly = args["comments_only"] as? Bool ?? false
+        let limit = min(max(args["limit"] as? Int ?? 50, 1), 200)
+        let formatter = ISO8601DateFormatter()
+        let events = card.timeline.filter { !commentsOnly || $0.kind == .comment }.suffix(limit)
+        return ["card": card.title, "activity": events.map {
+            ["id": $0.publicId, "kind": $0.kind.rawValue, "text": $0.text, "at": formatter.string(from: $0.createdAt)]
+        }]
+    }
+
+    private func listLabels(_ args: [String: Any]) throws -> Any {
+        let id = try required(args, "board_id")
+        guard let board = try context.fetch(FetchDescriptor<Board>(predicate: #Predicate { $0.publicId == id && $0.deletedAt == nil })).first else {
+            throw ToolError("No board with id \(id)")
+        }
+        return ["labels": board.labels.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }.map { label in
+            compact(["id": label.publicId, "name": label.name, "colour": label.colourCode,
+                     "open_cards": label.cards.filter { $0.deletedAt == nil && !$0.isArchived }.count])
         }]
     }
 
