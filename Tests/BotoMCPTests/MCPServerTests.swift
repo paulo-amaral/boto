@@ -86,7 +86,7 @@ final class MCPServerTests: XCTestCase {
     func testReadOnlyHidesAndRefusesEveryWrite() throws {
         let (server, _, _, list) = try makeServer(readOnly: true)
         let names = try XCTUnwrap((try send(server, "tools/list")["result"] as? [String: Any])?["tools"] as? [[String: Any]]).compactMap { $0["name"] as? String }
-        XCTAssertEqual(Set(names), ["list_projects", "get_board", "get_card", "get_card_activity", "list_labels", "search", "get_time_report"])
+        XCTAssertEqual(Set(names), ["list_projects", "get_board", "get_card", "get_card_activity", "list_labels", "search", "get_time_report"], "duplicate_project is a write tool")
         let reply = try send(server, "tools/call", ["name": "create_card", "arguments": ["list_id": list.publicId, "title": "x"]])
         XCTAssertNotNil(reply["error"], "a write tool does not exist in read-only mode")
         XCTAssertTrue(list.orderedCards.isEmpty)
@@ -201,6 +201,28 @@ final class MCPServerTests: XCTestCase {
         XCTAssertEqual(labels.first?["colour"] as? String, "#3b82f6")
         XCTAssertEqual(labels.first?["open_cards"] as? Int, 1, "archived cards are not counted")
         XCTAssertTrue(try call(server, "list_labels", ["board_id": "nope"]).isError)
+    }
+
+    func testDuplicateProjectCopiesWithOrWithoutCards() throws {
+        let (server, project, board, list) = try makeServer()
+        list.addCard(title: "Kickoff")
+        board.labels.append(KanbanCore.Label(name: "Research"))
+
+        let full = try call(server, "duplicate_project", ["project_id": project.publicId])
+        XCTAssertFalse(full.isError, full.text)
+        XCTAssertEqual(full.json["name"] as? String, "Client copy")
+        let fullLists = try XCTUnwrap(((full.json["boards"] as? [[String: Any]])?.first?["lists"]) as? [[String: Any]])
+        XCTAssertEqual(fullLists.first?["cards"] as? Int, 1)
+
+        let template = try call(server, "duplicate_project", ["project_id": project.publicId, "name": "  Template  ", "structure_only": true])
+        XCTAssertEqual(template.json["name"] as? String, "Template")
+        let templateLists = try XCTUnwrap(((template.json["boards"] as? [[String: Any]])?.first?["lists"]) as? [[String: Any]])
+        XCTAssertEqual(templateLists.map { $0["cards"] as? Int }, [0, 0, 0])
+
+        let again = try call(server, "duplicate_project", ["project_id": project.publicId])
+        XCTAssertEqual(again.json["name"] as? String, "Client copy 2", "a copy never takes a name in use")
+        XCTAssertEqual(list.orderedCards.count, 1, "the original is untouched")
+        XCTAssertTrue(try call(server, "duplicate_project", ["project_id": "nope"]).isError)
     }
 
     func testSearchFindsCardsAcrossProjects() throws {

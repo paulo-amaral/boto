@@ -81,6 +81,10 @@ final class BotoTools {
                        required: ["card_id", "title"], writes: true),
         ToolDefinition(name: "set_checklist_item_completed", description: "Tick or untick a checklist item.",
                        properties: ["item_id": text("Checklist item id, from get_card."), "completed": flag("True when done.")], required: ["item_id", "completed"], writes: true),
+        ToolDefinition(name: "duplicate_project", description: "Copy a project: boards, lists, labels and, unless structure_only, cards with their checklists and references. Hours, activity and calendar links stay with the original.",
+                       properties: ["project_id": text("Project id."), "name": text("Name of the copy. Default: \"<name> copy\"."),
+                                    "structure_only": flag("Copy only boards, lists and labels, as an empty template.")],
+                       required: ["project_id"], writes: true),
         ToolDefinition(name: "log_time", description: "Log time worked on a card or on a project as a whole. Give card_id or project_id.",
                        properties: ["card_id": text("Card id."), "project_id": text("Project id, for time with no card."),
                                     "minutes": ["type": "integer", "description": "Minutes worked, 1 to 1440."], "date": text(day + " Default: today."), "note": text("What was done.")],
@@ -106,6 +110,7 @@ final class BotoTools {
         case "set_card_archived": return try setArchived(arguments)
         case "add_checklist_item": return try addChecklistItem(arguments)
         case "set_checklist_item_completed": return try setItemCompleted(arguments)
+        case "duplicate_project": return try duplicateProject(arguments)
         case "log_time": return try logTime(arguments)
         default: throw ToolError("Unknown tool: \(name)")
         }
@@ -116,16 +121,18 @@ final class BotoTools {
     private func listProjects(_ args: [String: Any]) throws -> Any {
         let includeArchived = args["include_archived"] as? Bool ?? false
         let projects = try context.fetch(FetchDescriptor<Project>(predicate: #Predicate { $0.deletedAt == nil }, sortBy: [SortDescriptor(\.createdAt)]))
-        return ["projects": projects.filter { includeArchived || !$0.isArchived }.map { project in
-            compact([
-                "id": project.publicId, "name": project.name, "archived": project.isArchived ? true : nil,
-                "boards": project.activeBoards.map { board in
-                    ["id": board.publicId, "name": board.name,
-                     "lists": board.visibleLists(showArchived: false).map { ["id": $0.publicId, "name": $0.name, "cards": $0.visibleCards(showArchived: false).count] as [String: Any] }]
-                        as [String: Any]
-                },
-            ])
-        }]
+        return ["projects": projects.filter { includeArchived || !$0.isArchived }.map(projectSummary)]
+    }
+
+    private func projectSummary(_ project: Project) -> [String: Any] {
+        compact([
+            "id": project.publicId, "name": project.name, "archived": project.isArchived ? true : nil,
+            "boards": project.activeBoards.map { board in
+                ["id": board.publicId, "name": board.name,
+                 "lists": board.visibleLists(showArchived: false).map { ["id": $0.publicId, "name": $0.name, "cards": $0.visibleCards(showArchived: false).count] as [String: Any] }]
+                    as [String: Any]
+            },
+        ])
     }
 
     private func getBoard(_ args: [String: Any]) throws -> Any {
@@ -296,6 +303,17 @@ final class BotoTools {
         item.completed = completed
         try context.save()
         return ["item_id": item.publicId, "completed": completed]
+    }
+
+    private func duplicateProject(_ args: [String: Any]) throws -> Any {
+        try requireWritable()
+        let project = try findProject(try required(args, "project_id"))
+        let existing = try context.fetch(FetchDescriptor<Project>(predicate: #Predicate { $0.deletedAt == nil })).map(\.name)
+        let name = try optional(args, "name", limit: Self.titleLimit).flatMap { $0.isEmpty ? nil : $0 }
+            ?? Project.copyName(of: project.name, among: existing)
+        let copy = project.duplicate(named: name, withCards: !(args["structure_only"] as? Bool ?? false), in: context)
+        try context.save()
+        return projectSummary(copy)
     }
 
     private func logTime(_ args: [String: Any]) throws -> Any {

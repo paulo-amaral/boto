@@ -114,7 +114,7 @@ O servidor só lê por padrão. Acrescente `"args": ["--allow-writes"]` para o a
 
 | Leitura | Escrita (exige `--allow-writes`) |
 |---|---|
-| `list_projects`, `get_board`, `get_card`, `get_card_activity`, `list_labels`, `search`, `get_time_report` | `create_card`, `update_card`, `move_card`, `set_card_archived`, `add_checklist_item`, `set_checklist_item_completed`, `log_time` |
+| `list_projects`, `get_board`, `get_card`, `get_card_activity`, `list_labels`, `search`, `get_time_report` | `create_card`, `update_card`, `move_card`, `set_card_archived`, `duplicate_project`, `add_checklist_item`, `set_checklist_item_completed`, `log_time` |
 
 - Não há ferramenta de exclusão. Excluir e restaurar ficam no app, em Recently deleted.
 - Um cartão que está no Apple Calendar não pode ser concluído nem arquivado por aqui, porque isso remove o evento e só o app tem a permissão do calendário. Faça no app.
