@@ -170,15 +170,15 @@ struct CardDetailView: View {
         HStack(alignment: .top, spacing: 14) {
             Button { card.setCompleted(!card.isCompleted) } label: {
                 Image(systemName: card.isCompleted ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 24))
+                    .font(.system(size: 20))
                     .foregroundStyle(card.isCompleted ? Theme.success : Theme.muted)
             }
             .buttonStyle(.plain)
-            .padding(.top, 5)
+            .padding(.top, 3)
             .help(card.isCompleted ? "Mark incomplete" : "Mark complete")
             TextField("Title", text: $card.title, axis: .vertical)
                 .textFieldStyle(.plain)
-                .font(Theme.font(28, weight: .bold))
+                .font(Theme.font(20, weight: .semibold))
         }
     }
 
