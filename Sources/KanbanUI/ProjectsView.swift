@@ -16,6 +16,7 @@ public struct ProjectsView: View {
     @State private var showHelp = false
     @State private var showGitHub = false
     @State private var showImport = false
+    @State private var showDeleted = false
     @Environment(\.openWindow) private var openWindow
     @State private var fileVault = SystemSecurity.FileVaultState.unknown
     @State private var fileVaultNoticeDismissed = false
@@ -84,7 +85,7 @@ public struct ProjectsView: View {
         .task(id: projects.count) { ProjectIcons.assignMissing(to: projects) }
         .task { fileVault = await Task.detached { SystemSecurity.fileVaultState() }.value }
         .modifier(ProjectSheets(
-            showHelp: $showHelp, showGitHub: $showGitHub, showImport: $showImport,
+            showHelp: $showHelp, showGitHub: $showGitHub, showImport: $showImport, showDeleted: $showDeleted,
             renaming: $renaming, deleting: $deleting, selectedId: $selectedId
         ))
     }
@@ -139,6 +140,7 @@ public struct ProjectsView: View {
             .scrollIndicators(.hidden)
 
             sidebarButton("square.and.arrow.down", "Import", help: "Import from Trello or GitHub") { showImport = true }
+            sidebarButton("arrow.uturn.backward.circle", "Recently deleted", help: "Restore deleted projects, lists and cards") { showDeleted = true }
             sidebarButton("chevron.left.forwardslash.chevron.right", "GitHub", help: "GitHub settings") { showGitHub = true }
             sidebarButton("questionmark.circle", "Help", shortcut: "/", help: "Help (/)") { showHelp = true }
         }
@@ -338,6 +340,7 @@ private struct ProjectSheets: ViewModifier {
     @Binding var showHelp: Bool
     @Binding var showGitHub: Bool
     @Binding var showImport: Bool
+    @Binding var showDeleted: Bool
     @Binding var renaming: Project?
     @Binding var deleting: Project?
     @Binding var selectedId: String
@@ -347,6 +350,7 @@ private struct ProjectSheets: ViewModifier {
             .sheet(isPresented: $showHelp) { HelpView() }
             .sheet(isPresented: $showGitHub) { GitHubSettingsSheet() }
             .sheet(isPresented: $showImport) { ImportSheet { selectedId = $0.publicId } }
+            .sheet(isPresented: $showDeleted) { RecentlyDeletedView() }
             .sheet(item: $renaming) { RenameProjectSheet(project: $0) }
             .confirmationDialog(
                 "Delete \"\(deleting?.name ?? "")\"?",
