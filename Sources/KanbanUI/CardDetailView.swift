@@ -47,6 +47,17 @@ struct CardDetailView: View {
         // A new window puts keyboard focus, with the text selected, in its first field. Start with nothing focused.
         .background(MovableByBackground())
         .onAppear { DispatchQueue.main.async { NSApp.keyWindow?.makeFirstResponder(nil) } }
+        .confirmationDialog("Delete this card?", isPresented: $confirmingDelete) {
+            Button("Delete card", role: .destructive) { card.deletedAt = Date(); closeWindow() }
+        } message: {
+            Text("The card disappears from the board. Linked files are not touched. Archive it instead to keep it.")
+        }
+    }
+
+    /// "Colour..." in the Add menu on a card with no colour yet: the swatch that normally hosts the picker does not
+    /// exist until a colour is set, so the picker opens from the Add button instead.
+    private var colourFromAdd: Binding<Bool> {
+        Binding(get: { popover == .colour && card.colorHex == nil }, set: { if !$0 && popover == .colour { popover = nil } })
     }
 
     private func isShowing(_ chip: Chip) -> Binding<Bool> {
@@ -180,6 +191,7 @@ struct CardDetailView: View {
     private var chipsRow: some View {
         FlowLayout(spacing: 8) {
             chip("Add", "plus", .add) { addChoices }
+                .popover(isPresented: colourFromAdd, arrowEdge: .bottom) { ColorChoice(hex: $card.colorHex).padding(14) }
             chip("Labels", "tag", .labels) { labelsEditor }
             chip("Importance", "exclamationmark.circle", .importance) { importanceChoices }
             chip("Dates", "clock", .dates) { datePicker }
@@ -345,11 +357,6 @@ struct CardDetailView: View {
             DropdownEntry(icon: "paintpalette", title: "Colour...") { popover = .colour },
         ]) { popover = nil }
         .sheet(isPresented: $addingGitHub) { AddGitHubSheet(card: card) }
-        .confirmationDialog("Delete this card?", isPresented: $confirmingDelete) {
-            Button("Delete card", role: .destructive) { card.deletedAt = Date(); closeWindow() }
-        } message: {
-            Text("The card disappears from the board. Linked files are not touched. Archive it instead to keep it.")
-        }
     }
 
     private var labelsEditor: some View {
