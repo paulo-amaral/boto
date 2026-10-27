@@ -90,112 +90,173 @@ private func saveCSV(_ text: String, named name: String) {
 struct TimeReportView: View {
     let project: Project
     @State private var from = Calendar.current.dateInterval(of: .weekOfYear, for: Date())?.start ?? Date()
-    @State private var to = Date()
+    @State private var to = Calendar.current.dateInterval(of: .weekOfYear, for: Date())?.end.addingTimeInterval(-1) ?? Date()
     @State private var target: Card?
-    @State private var showingForm = true
+    @State private var showingForm = false
 
-    private func preset(_ component: Calendar.Component, offset: Int) {
-        let calendar = Calendar.current
+    private let calendar = Calendar.current
+
+    private func range(_ component: Calendar.Component, offset: Int) -> (start: Date, end: Date)? {
         guard let current = calendar.dateInterval(of: component, for: Date()),
               let start = calendar.date(byAdding: component, value: offset, to: current.start),
-              let end = calendar.dateInterval(of: component, for: start)?.end else { return }
-        from = start
-        to = end.addingTimeInterval(-1)
+              let end = calendar.dateInterval(of: component, for: start)?.end else { return nil }
+        return (start, end.addingTimeInterval(-1))
+    }
+
+    private func presetButton(_ title: String, _ component: Calendar.Component, offset: Int) -> some View {
+        let period = range(component, offset: offset)
+        let selected = period.map { calendar.isDate(from, inSameDayAs: $0.start) && calendar.isDate(to, inSameDayAs: $0.end) } ?? false
+        return Button(title) {
+            if let period { from = period.start; to = period.end }
+        }
+        .buttonStyle(.plain)
+        .font(Theme.font(12, weight: .medium))
+        .foregroundStyle(selected ? Theme.text : Theme.mutedStrong)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(selected ? Theme.border : Theme.card, in: RoundedRectangle(cornerRadius: Theme.cornerRadius))
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
     var body: some View {
         let report = TimeReport(project: project, from: from, to: to)
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    HStack(spacing: 8) {
-                        Button("This week") { preset(.weekOfYear, offset: 0) }
-                        Button("Last week") { preset(.weekOfYear, offset: -1) }
-                        Button("This month") { preset(.month, offset: 0) }
-                        Button("Last month") { preset(.month, offset: -1) }
-                    }
-                    HStack(spacing: 16) {
-                        DatePicker("From", selection: $from, displayedComponents: .date)
-                        DatePicker("To", selection: $to, displayedComponents: .date)
-                    }
-                    .font(Theme.font(12))
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                HStack(spacing: 6) {
+                    presetButton("This week", .weekOfYear, offset: 0)
+                    presetButton("Last week", .weekOfYear, offset: -1)
+                    presetButton("This month", .month, offset: 0)
+                    presetButton("Last month", .month, offset: -1)
+                    Spacer()
+                    DatePicker("From", selection: $from, displayedComponents: .date).fixedSize()
+                    DatePicker("To", selection: $to, displayedComponents: .date).fixedSize()
+                }
+                .font(Theme.font(12))
 
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(TimeReport.clock(report.totalSeconds)).font(Theme.font(26, weight: .bold))
-                        Text("hours in this period").font(Theme.font(12)).foregroundStyle(Theme.muted)
-                        Spacer()
-                        Button { saveCSV(report.csv, named: "\(project.name) hours.csv") } label: { Label("Export CSV", systemImage: "square.and.arrow.up") }
-                            .disabled(report.rows.isEmpty)
-                    }
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(TimeReport.clock(report.totalSeconds)).font(Theme.font(26, weight: .bold))
+                    Text("hours in this period").font(Theme.font(12)).foregroundStyle(Theme.muted)
+                    Spacer()
+                    Button { showingForm.toggle() } label: { Label("Add time", systemImage: showingForm ? "minus" : "plus") }
+                    Button { saveCSV(report.csv, named: "\(project.name) hours.csv") } label: { Label("Export CSV", systemImage: "square.and.arrow.up") }
+                        .disabled(report.rows.isEmpty)
+                }
 
-                    DisclosureGroup("Add time worked", isExpanded: $showingForm) {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Picker("On", selection: $target) {
-                                Text("The project (no card)").tag(Card?.none)
-                                ForEach(project.timeableCards, id: \.publicId) { Text($0.title).tag(Card?.some($0)) }
-                            }
-                            .font(Theme.font(12))
-                            TimeEntryFields { seconds, day, note in
-                                if let target { target.logTime(seconds: seconds, on: day, note: note) }
-                                else { project.logTime(seconds: seconds, on: day, note: note) }
-                            }
+                if showingForm {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Picker("On", selection: $target) {
+                            Text("The project (no card)").tag(Card?.none)
+                            ForEach(project.timeableCards, id: \.publicId) { Text($0.title).tag(Card?.some($0)) }
                         }
-                        .padding(.top, 8)
+                        .font(Theme.font(12))
+                        TimeEntryFields { seconds, day, note in
+                            if let target { target.logTime(seconds: seconds, on: day, note: note) }
+                            else { project.logTime(seconds: seconds, on: day, note: note) }
+                        }
                     }
-                    .font(Theme.font(13, weight: .semibold))
+                    .padding(14)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Theme.card, in: RoundedRectangle(cornerRadius: Theme.cornerRadius))
+                }
 
-                    if report.rows.isEmpty {
-                        Text("No time logged in this period. Add time above, or use a card's Time button.")
-                            .font(Theme.font(12)).foregroundStyle(Theme.muted)
-                    } else {
-                        group("By day") {
+                if report.rows.isEmpty {
+                    Text("No time logged in this period. Add time above, or use a card's Time button.")
+                        .font(Theme.font(12)).foregroundStyle(Theme.muted)
+                } else {
+                    HStack(alignment: .top, spacing: 16) {
+                        panel("By day") {
+                            let longest = report.byDay.map(\.seconds).max() ?? 1
                             ForEach(report.byDay, id: \.day) { entry in
-                                line(entry.day.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated)), entry.seconds)
+                                barLine(entry.day.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated)), entry.seconds, of: longest)
                             }
                         }
-                        group("By card") {
-                            ForEach(report.byCard, id: \.title) { line($0.title, $0.seconds) }
+                        panel("By card") {
+                            let longest = report.byCard.map(\.seconds).max() ?? 1
+                            ForEach(report.byCard, id: \.title) { barLine($0.title, $0.seconds, of: longest) }
                         }
-                        group("Entries") {
-                            ForEach(report.rows, id: \.entry.publicId) { row in
-                                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                                    Text(row.day.formatted(.dateTime.day().month(.abbreviated))).foregroundStyle(Theme.muted)
-                                    VStack(alignment: .leading, spacing: 1) {
-                                        Text(row.note.isEmpty ? row.cardTitle : row.note).lineLimit(2)
-                                        if !row.note.isEmpty {
-                                            Text(row.cardTitle).font(Theme.font(11)).foregroundStyle(Theme.muted).lineLimit(1)
-                                        }
-                                    }
+                    }
+
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Entries").font(Theme.font(13, weight: .semibold))
+                        ForEach(report.byDay, id: \.day) { group in
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack {
+                                    Text(group.day.formatted(.dateTime.weekday(.wide).day().month(.abbreviated)))
                                     Spacer()
-                                    Text(TimeReport.clock(row.seconds)).foregroundStyle(Theme.mutedStrong)
-                                    Button { row.entry.stop(); row.entry.deletedAt = Date() } label: { Image(systemName: "trash") }
-                                        .buttonStyle(.plain)
-                                        .help("Delete this entry")
+                                    Text(TimeReport.clock(group.seconds))
                                 }
-                                .font(Theme.font(12))
+                                .font(Theme.font(11, weight: .semibold))
+                                .foregroundStyle(Theme.muted)
+                                .padding(.trailing, ReportEntryLine.deleteColumnWidth)
+                                Divider()
+                                ForEach(report.rows.filter { $0.day == group.day }, id: \.entry.publicId) { ReportEntryLine(row: $0) }
                             }
                         }
                     }
                 }
-                .padding(.horizontal, 22)
-                .padding(.bottom, 22)
             }
+            .padding(.horizontal, 22)
+            .padding(.bottom, 22)
         }
     }
 
-    private func group<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+    private func panel<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
             Text(title).font(Theme.font(13, weight: .semibold))
             content()
         }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .background(Theme.card, in: RoundedRectangle(cornerRadius: Theme.cornerRadius))
     }
 
-    private func line(_ title: String, _ seconds: Int) -> some View {
-        HStack {
-            Text(title).font(Theme.font(12)).lineLimit(1)
-            Spacer()
-            Text(TimeReport.clock(seconds)).font(Theme.font(12, weight: .medium)).foregroundStyle(Theme.mutedStrong)
+    /// A label and its time, with a bar sized against the longest line of the same list.
+    private func barLine(_ title: String, _ seconds: Int, of longest: Int) -> some View {
+        VStack(spacing: 4) {
+            HStack {
+                Text(title).font(Theme.font(12)).lineLimit(1)
+                Spacer()
+                Text(TimeReport.clock(seconds)).font(Theme.font(12, weight: .medium)).foregroundStyle(Theme.mutedStrong)
+            }
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Theme.divider)
+                    Capsule().fill(Color.accentColor).frame(width: geometry.size.width * CGFloat(seconds) / CGFloat(max(longest, 1)))
+                }
+            }
+            .frame(height: 4)
         }
+    }
+}
+
+/// One logged entry. The delete button appears on hover so a stray click on a quiet row cannot remove time.
+private struct ReportEntryLine: View {
+    /// The delete button's width plus the gap before it, so day subtotals line up with the entry times.
+    static let deleteColumnWidth: CGFloat = 22
+    let row: TimeReport.Row
+    @State private var hovering = false
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(row.note.isEmpty ? row.cardTitle : row.note).lineLimit(2)
+                if !row.note.isEmpty {
+                    Text(row.cardTitle).font(Theme.font(11)).foregroundStyle(Theme.muted).lineLimit(1)
+                }
+            }
+            Spacer()
+            Text(TimeReport.clock(row.seconds)).foregroundStyle(Theme.mutedStrong)
+            Button { row.entry.stop(); row.entry.deletedAt = Date() } label: { Image(systemName: "trash") }
+                .buttonStyle(.plain)
+                .foregroundStyle(Theme.muted)
+                .opacity(hovering ? 1 : 0)
+                .help("Delete this entry")
+                .accessibilityLabel("Delete this entry")
+        }
+        .font(Theme.font(12))
+        .padding(.vertical, 4)
+        .contentShape(Rectangle())
+        .onHover { hovering = $0 }
     }
 }
 
