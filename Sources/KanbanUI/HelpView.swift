@@ -15,6 +15,8 @@ struct HelpView: View {
     private let topics: [(title: String, lines: [String])] = [
         ("Projects", [
             "Create a project with the + in the sidebar or with ⌘N. Right-click a project to rename it, set its root folder or delete it.",
+            "Change icon, in the project menu, picks the project's icon from about 1,900 Lucide icons, with search; Automatic hands the choice back to Boto.",
+            "Duplicate project, in the project menu, makes a copy with the same boards, lists, labels, checklists and cards, and opens it. Hours, activity, the Kaizen log and Apple Calendar links stay with the original, so the copy starts without history. It is also a way to reuse a project as a template.",
             "The project menu (the ... in the board header, or right-click in the sidebar) has Edit root folder, Archive project, Add to favorites and Delete project. Each project gets its own icon automatically, and it cannot be changed; the collapsed sidebar shows that icon. Favorites are listed first. Archived projects are hidden, and left out of search, until you click the archive icon next to PROJECTS.",
             "The root folder is usually the client folder or your Obsidian vault. Boto keeps a link to it and never copies your files. Set, change or reveal it from the ... menu in the board header.",
             "Collapse the sidebar with the button at its top; it keeps one tile per project. In a window narrower than 700 points the kanban columns become one vertical list, with each list under the previous one. In a window narrower than 900 points the sidebar collapses by itself, the buttons in the board header lose their text, and lists get narrower. Rename a project or a list by double-clicking its name.",

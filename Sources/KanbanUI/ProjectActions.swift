@@ -6,10 +6,12 @@ import SwiftUI
 /// project has to an address.
 enum ProjectMenu {
     static func entries(for project: Project, onRename: (() -> Void)? = nil, onChangeIcon: (() -> Void)? = nil,
+                        onDuplicate: (() -> Void)? = nil,
                         onChooseRoot: @escaping () -> Void, onDelete: @escaping () -> Void) -> [DropdownEntry] {
         var entries: [DropdownEntry] = []
         if let onRename { entries.append(DropdownEntry(icon: "pencil", title: "Rename...", action: onRename)) }
         if let onChangeIcon { entries.append(DropdownEntry(icon: "square.grid.2x2", title: "Change icon...", action: onChangeIcon)) }
+        if let onDuplicate { entries.append(DropdownEntry(icon: "plus.square.on.square", title: "Duplicate project", action: onDuplicate)) }
         entries.append(DropdownEntry(
             icon: "folder",
             title: project.rootFolderPath == nil ? "Set root folder..." : "Edit root folder...",

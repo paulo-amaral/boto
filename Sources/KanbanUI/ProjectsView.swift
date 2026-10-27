@@ -235,6 +235,7 @@ public struct ProjectsView: View {
                 for: project,
                 onRename: { renaming = project },
                 onChangeIcon: { changingIcon = project },
+                onDuplicate: { duplicate(project) },
                 onChooseRoot: { chooseRoot(for: project) },
                 onDelete: { deleting = project }
             ))
@@ -250,7 +251,8 @@ public struct ProjectsView: View {
                 board: board,
                 onChooseRoot: { chooseRoot(for: project) },
                 onDelete: { deleting = project },
-                onChangeIcon: { changingIcon = project }
+                onChangeIcon: { changingIcon = project },
+                onDuplicate: { duplicate(project) }
             )
                 .id(board.publicId)
         } else {
@@ -306,6 +308,12 @@ public struct ProjectsView: View {
         project.addBoard(name: name)
         selectedId = project.publicId
         return project
+    }
+
+    /// A copy of the project's boards, lists and cards, opened right away. Hours and history stay with the original.
+    private func duplicate(_ project: Project) {
+        let copy = project.duplicate(named: Project.copyName(of: project.name, among: projects.map(\.name)), in: context)
+        selectedId = copy.publicId
     }
 
     private func chooseRoot(for project: Project) {
