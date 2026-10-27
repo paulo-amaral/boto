@@ -14,6 +14,7 @@ struct ListView: View {
     @State private var adding = false
     @State private var pasting = false
     @State private var editingFlow = false
+    @State private var confirmingDelete = false
     @State private var newTitle = ""
     @State private var emailTargeted = false
     @State private var dropProblem: String?
@@ -41,7 +42,7 @@ struct ListView: View {
                     }
                     Button { editingFlow = true } label: { Label("Flow settings...", systemImage: "slider.horizontal.3") }
                     Divider()
-                    Button(role: .destructive) { list.deletedAt = Date() } label: { Label("Delete list", systemImage: "trash") }
+                    Button(role: .destructive) { confirmingDelete = true } label: { Label("Delete list", systemImage: "trash") }
                 } label: { Image(systemName: "ellipsis") }
                     .accessibilityLabel("List options")
                     .menuStyle(.borderlessButton)
@@ -100,6 +101,12 @@ struct ListView: View {
         )
         .sheet(isPresented: $pasting) { PasteCardsSheet(list: list) }
         .sheet(isPresented: $editingFlow) { ListFlowSheet(list: list) }
+        .confirmationDialog("Delete \"\(list.name)\"?", isPresented: $confirmingDelete) {
+            Button("Delete list", role: .destructive) { list.deletedAt = Date() }
+        } message: {
+            let count = list.cards.filter { $0.deletedAt == nil }.count
+            Text("The list and its \(count) card\(count == 1 ? "" : "s") disappear from the board. Archive the list instead to keep them.")
+        }
     }
 
     @ViewBuilder

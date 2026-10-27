@@ -17,6 +17,7 @@ struct CardDetailView: View {
     @State private var showDetails = true
     @State private var addingGitHub = false
     @State private var calendarError: String?
+    @State private var confirmingDelete = false
 
     private var board: Board? { card.list?.board }
     private var projectRoot: URL? { board?.project?.rootFolderURL }
@@ -100,7 +101,7 @@ struct CardDetailView: View {
                           systemImage: card.isArchived ? "arrow.uturn.backward" : "archivebox")
                 }
                 Divider()
-                Button(role: .destructive) { card.deletedAt = Date(); closeWindow() } label: {
+                Button(role: .destructive) { confirmingDelete = true } label: {
                     Label("Delete", systemImage: "trash")
                 }
             } label: {
@@ -344,6 +345,11 @@ struct CardDetailView: View {
             DropdownEntry(icon: "paintpalette", title: "Colour...") { popover = .colour },
         ]) { popover = nil }
         .sheet(isPresented: $addingGitHub) { AddGitHubSheet(card: card) }
+        .confirmationDialog("Delete this card?", isPresented: $confirmingDelete) {
+            Button("Delete card", role: .destructive) { card.deletedAt = Date(); closeWindow() }
+        } message: {
+            Text("The card disappears from the board. Linked files are not touched. Archive it instead to keep it.")
+        }
     }
 
     private var labelsEditor: some View {

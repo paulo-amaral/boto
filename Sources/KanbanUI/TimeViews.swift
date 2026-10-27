@@ -102,7 +102,14 @@ private func saveCSV(_ text: String, named name: String) {
     panel.allowedContentTypes = [.commaSeparatedText]
     panel.nameFieldStringValue = name
     guard panel.runModal() == .OK, let url = panel.url else { return }
-    try? text.write(to: url, atomically: true, encoding: .utf8)
+    do {
+        try text.write(to: url, atomically: true, encoding: .utf8)
+    } catch {
+        let alert = NSAlert()
+        alert.messageText = "The CSV was not saved"
+        alert.informativeText = error.localizedDescription
+        alert.runModal()
+    }
 }
 
 struct TimeReportView: View {
@@ -253,6 +260,7 @@ private struct ReportEntryLine: View {
     static let deleteColumnWidth: CGFloat = 22
     let row: TimeReport.Row
     @State private var hovering = false
+    @FocusState private var deleteFocused: Bool
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -267,7 +275,8 @@ private struct ReportEntryLine: View {
             Button { row.entry.stop(); row.entry.deletedAt = Date() } label: { Image(systemName: "trash") }
                 .buttonStyle(.plain)
                 .foregroundStyle(Theme.muted)
-                .opacity(hovering ? 1 : 0)
+                .focused($deleteFocused)
+                .opacity(hovering || deleteFocused ? 1 : 0)
                 .help("Delete this entry")
                 .accessibilityLabel("Delete this entry")
         }
