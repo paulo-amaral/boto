@@ -13,6 +13,15 @@ struct CardTile: View {
     @State private var targeted = false
     @State private var problem: String?
 
+    /// Once a selection exists, plain clicks keep adding to it, like a file list.
+    private func activate() {
+        if NSEvent.modifierFlags.contains(.command) || !selection.isEmpty {
+            selection.formSymmetricDifference([card.publicId])
+        } else {
+            openWindow(value: CardWindowID(cardId: card.publicId))
+        }
+    }
+
     var body: some View {
         CardView(card: card, isSelected: selection.contains(card.publicId))
             .overlay(RoundedRectangle(cornerRadius: Theme.cornerRadius).strokeBorder(Theme.text.opacity(targeted ? 0.8 : 0), lineWidth: 2))
@@ -26,14 +35,10 @@ struct CardTile: View {
                         .background(RoundedRectangle(cornerRadius: Theme.cornerRadius).fill(Theme.background.opacity(0.95)))
                 }
             }
-            .onTapGesture {
-                // Once a selection exists, plain clicks keep adding to it, like a file list.
-                if NSEvent.modifierFlags.contains(.command) || !selection.isEmpty {
-                    selection.formSymmetricDifference([card.publicId])
-                } else {
-                    openWindow(value: CardWindowID(cardId: card.publicId))
-                }
-            }
+            .onTapGesture(perform: activate)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityHint(selection.isEmpty ? "Opens the card" : "Adds the card to the selection")
+            .accessibilityAction(.default, activate)
             .draggable(card.publicId)
             // A message from Mail dropped on a card is added to that card; a card dropped on it is placed by the list.
             .boardDrop(

@@ -31,6 +31,7 @@ struct ListView: View {
                 Button { adding = true } label: { Image(systemName: "plus") }
                     .buttonStyle(.plain)
                     .help("Add card")
+                    .accessibilityLabel("Add card")
                 Menu {
                     Button { adding = true } label: { Label("Add a card", systemImage: "plus") }
                     Button { pasting = true } label: { Label("Paste cards from text...", systemImage: "doc.on.clipboard") }
@@ -42,6 +43,7 @@ struct ListView: View {
                     Divider()
                     Button(role: .destructive) { list.deletedAt = Date() } label: { Label("Delete list", systemImage: "trash") }
                 } label: { Image(systemName: "ellipsis") }
+                    .accessibilityLabel("List options")
                     .menuStyle(.borderlessButton)
                     .menuIndicator(.hidden)
                     .labelStyle(.titleAndIcon)
@@ -292,6 +294,7 @@ public struct BoardView: View {
         Button { menuOpen.toggle() } label: { Image(systemName: "ellipsis") }
             .buttonStyle(ToolbarButtonStyle(primary: false))
             .help("More")
+            .accessibilityLabel("More")
     }
 
     private func addDatedCardsToCalendar() {

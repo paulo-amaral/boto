@@ -39,6 +39,8 @@ struct CommandPalette: View {
                         ForEach(Array(results.enumerated()), id: \.element.id) { index, result in
                             row(result, isHighlighted: index == highlighted)
                                 .onTapGesture { choose(index) }
+                                .accessibilityAddTraits(index == highlighted ? [.isButton, .isSelected] : .isButton)
+                                .accessibilityAction(.default) { choose(index) }
                         }
                     }
                     .padding(.vertical, 8)

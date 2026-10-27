@@ -27,6 +27,8 @@ struct InlineEditText: View {
                 .contentShape(Rectangle())
                 .onTapGesture(count: 2) { editing = true }
                 .help("Double-click to rename")
+                .accessibilityAddTraits(.isButton)
+                .accessibilityAction(named: "Rename") { editing = true }
         }
     }
 }

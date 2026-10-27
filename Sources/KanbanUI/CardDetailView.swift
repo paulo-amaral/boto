@@ -113,6 +113,7 @@ struct CardDetailView: View {
             Button { closeWindow() } label: { Image(systemName: "xmark").frame(width: 28, height: 28) }
                 .buttonStyle(.plain)
                 .keyboardShortcut(.cancelAction)
+                .accessibilityLabel("Close card")
         }
         .foregroundStyle(Theme.mutedStrong)
         .padding(.horizontal, 16)
@@ -714,6 +715,7 @@ struct ChecklistItemRow: View {
                 .foregroundStyle(item.completed ? Theme.muted : Theme.text)
             Button { item.deletedAt = Date() } label: { Image(systemName: "xmark") }
                 .buttonStyle(.plain).foregroundStyle(Theme.muted)
+                .accessibilityLabel("Delete checklist item")
         }
     }
 }

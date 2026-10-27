@@ -226,6 +226,8 @@ public struct ProjectsView: View {
         .help(project.name)
         .contentShape(Rectangle())
         .onTapGesture { selectedId = project.publicId }
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+        .accessibilityAction(.default) { selectedId = project.publicId }
         .contextMenu {
             ProjectActions(entries: ProjectMenu.entries(
                 for: project,

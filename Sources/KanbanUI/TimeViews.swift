@@ -81,6 +81,7 @@ struct TimeForm: View {
                         Button { entry.stop(); entry.deletedAt = Date() } label: { Image(systemName: "trash") }
                             .buttonStyle(.plain)
                             .help("Delete this entry")
+                            .accessibilityLabel("Delete this entry")
                     }
                     .font(Theme.font(12))
                 }
@@ -496,6 +497,7 @@ private struct EntryEditRow: View {
             Button { entry.stop(); entry.deletedAt = Date() } label: { Image(systemName: "trash") }
                 .buttonStyle(.plain)
                 .help("Delete this entry")
+                .accessibilityLabel("Delete this entry")
         }
         .textFieldStyle(.roundedBorder)
         .font(Theme.font(12))

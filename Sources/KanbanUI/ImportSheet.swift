@@ -33,6 +33,7 @@ struct ImportSheet: View {
                     .help("Imports create a new project. Nothing is changed in Trello or GitHub.")
                 Spacer()
                 Button { dismiss() } label: { Image(systemName: "xmark") }.buttonStyle(.plain).foregroundStyle(Theme.muted)
+                    .accessibilityLabel("Close")
             }
 
             Picker("Source", selection: $source) {
