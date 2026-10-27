@@ -7,7 +7,10 @@ let package = Package(
     targets: [
         .target(name: "KanbanCore"),
         .target(name: "KanbanUI", dependencies: ["KanbanCore"]),
+        .target(name: "BotoMCP", dependencies: ["KanbanCore"]),
+        .executableTarget(name: "boto-mcp", dependencies: ["BotoMCP", "KanbanCore"]),
         .executableTarget(name: "Boto", dependencies: ["KanbanUI", "KanbanCore"]),
         .testTarget(name: "KanbanCoreTests", dependencies: ["KanbanCore"]),
-        .testTarget(name: "KanbanUITests", dependencies: ["KanbanUI", "KanbanCore"]),    ]
+        .testTarget(name: "KanbanUITests", dependencies: ["KanbanUI", "KanbanCore"]),
+        .testTarget(name: "BotoMCPTests", dependencies: ["BotoMCP", "KanbanCore"]),    ]
 )

@@ -1,0 +1,30 @@
+import BotoMCP
+import Foundation
+import KanbanCore
+import SwiftData
+
+// Boto's MCP server, for an AI assistant to read and update the same database the app uses.
+// Usage: boto-mcp [--read-only]   (talks JSON-RPC over stdin and stdout; logs go to stderr)
+
+func fail(_ message: String) -> Never {
+    FileHandle.standardError.write(Data("boto-mcp: \(message)\n".utf8))
+    exit(1)
+}
+
+@MainActor
+func serve() {
+    let container: ModelContainer
+    do {
+        container = try ModelContainer(for: Schema(KanbanSchema.models), configurations: ModelConfiguration(url: try BotoPaths.storeURL()))
+    } catch {
+        fail("could not open the Boto database: \(error)")
+    }
+
+    let server = MCPServer(context: container.mainContext, readOnly: CommandLine.arguments.contains("--read-only"))
+    while let line = readLine(strippingNewline: true) {
+        guard !line.isEmpty, let reply = server.handle(line: line) else { continue }
+        FileHandle.standardOutput.write(Data((reply + "\n").utf8))
+    }
+}
+
+MainActor.assumeIsolated { serve() }

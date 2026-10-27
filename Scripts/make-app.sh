@@ -15,6 +15,7 @@ app="$root/build/Boto.app"
 rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp "$bin" "$app/Contents/MacOS/Boto"
+cp "$(dirname "$bin")/boto-mcp" "$app/Contents/MacOS/boto-mcp"
 cp -R "$root/Resources/Fonts" "$app/Contents/Resources/Fonts"
 cp -R "$root/Resources/Lucide" "$app/Contents/Resources/Lucide"
 
