@@ -4,6 +4,17 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-27
+
+### Changed
+- Hours report: period chips with the chosen range marked, a bar for each day and card, entries grouped by day with a subtotal, and delete on hover.
+- The "Add time" form opens on demand in the report, and takes a typed time ("1:30", "1.5", "90m", "2h30") instead of steppers. Return adds the entry.
+- Commit subjects follow Conventional Commits, checked by a hook and by CI on pull requests.
+- README grouped by topic, with new screenshots of the full Hours window and report.
+
+### Security
+- Releases wait for approval through the `release` environment, which only accepts `v*` tags.
+
 ## [0.1.0] - 2026-10-27
 
 ### Added
@@ -17,5 +28,6 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 ### Security
 - CSV exports neutralise fields that start with `=`, `+`, `-`, `@`, tab or carriage return.
 
-[Unreleased]: https://github.com/paulo-amaral/boto/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/paulo-amaral/boto/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/paulo-amaral/boto/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/paulo-amaral/boto/releases/tag/v0.1.0
