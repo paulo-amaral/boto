@@ -5,28 +5,45 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 /// Date, duration and what was done. Shared by the card and the project report; `onAdd` receives seconds, day and note.
+/// The duration is typed ("1:30", "1.5", "90m", "2h30"), as in the timesheet, and Return in either field adds the entry.
 struct TimeEntryFields: View {
     let onAdd: (Int, Date, String) -> Void
     @State private var day = Date()
-    @State private var hours = 1
-    @State private var minutes = 0
+    @State private var duration = ""
     @State private var note = ""
+
+    private var seconds: Int? { DurationParser.seconds(from: duration).flatMap { $0 > 0 ? $0 : nil } }
+    private var showsHint: Bool { !duration.trimmingCharacters(in: .whitespaces).isEmpty && seconds == nil }
+
+    private func add() {
+        guard let seconds else { return }
+        onAdd(seconds, day, note)
+        duration = ""
+        note = ""
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            DatePicker("Date", selection: $day, displayedComponents: .date).font(Theme.font(12))
+            HStack(spacing: 10) {
+                DatePicker("Date", selection: $day, displayedComponents: .date).labelsHidden().fixedSize()
+                TextField("Time, e.g. 1:30", text: $duration)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(width: 120)
+                    .onSubmit(add)
+            }
+            TextField("What did you work on?", text: $note, axis: .vertical)
+                .textFieldStyle(.roundedBorder)
+                .lineLimit(1...3)
+                .onSubmit(add)
             HStack {
-                Stepper("\(hours) h", value: $hours, in: 0...24)
-                Stepper("\(minutes) min", value: $minutes, in: 0...55, step: 5)
+                if showsHint {
+                    Text("Use 1:30, 1.5, 90m or 2h30, up to 24 hours.").font(Theme.font(11)).foregroundStyle(Theme.muted)
+                }
+                Spacer()
+                Button("Add", action: add).disabled(seconds == nil)
             }
-            .font(Theme.font(12))
-            TextField("What did you work on?", text: $note, axis: .vertical).textFieldStyle(.roundedBorder).lineLimit(1...3)
-            Button("Add") {
-                onAdd(hours * 3600 + minutes * 60, day, note)
-                note = ""
-            }
-            .disabled(hours == 0 && minutes == 0)
         }
+        .font(Theme.font(12))
     }
 }
 
