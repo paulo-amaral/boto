@@ -6,6 +6,12 @@ import SwiftUI
 struct HelpView: View {
     @Environment(\.dismiss) private var dismiss
 
+    /// Where boto-mcp sits in the app that is running. A bare `swift run` has no bundle, so the usual place is shown.
+    private static var mcpPath: String {
+        let bundle = Bundle.main.bundlePath
+        return (bundle.hasSuffix(".app") ? bundle : "/Applications/Boto.app") + "/Contents/MacOS/boto-mcp"
+    }
+
     private let topics: [(title: String, lines: [String])] = [
         ("Projects", [
             "Create a project with the + in the sidebar or with ⌘N. Right-click a project to rename it, set its root folder or delete it.",
@@ -60,6 +66,12 @@ struct HelpView: View {
             "Export CSV writes the week as a spreadsheet: one line per task with the hours of each day as decimals, and a total line.",
             "Report, at the top of the window, shows the time between any two dates (or this or last week or month) by day and by card, lists every entry, and exports one CSV line per entry.",
             "In a card, Time keeps a timer and lets you add time by hand. Only one timer runs at a time, so starting another stops the first. A timer that runs past midnight counts for the day it started. The card shows its total with an hourglass, or a timer icon while running.",
+        ]),
+        ("AI assistants", [
+            "Boto includes boto-mcp, a small server that lets an AI assistant such as Claude read your boards. It runs on your Mac, and only when the assistant starts it.",
+            "In Claude Code, run: claude mcp add boto -- \"\(HelpView.mcpPath)\". In another assistant, add that path as a stdio server in its MCP settings.",
+            "It only reads by default. To let the assistant create and change cards, add the argument --allow-writes. No tool deletes anything, and a card on the Apple Calendar can only be completed or archived inside Boto.",
+            "What the assistant reads is sent to the company that runs its model. Do not connect it to boards you cannot share.",
         ]),
         ("Backups", [
             "Boto copies its database once a day into a Backups folder beside it, when it opens and every six hours after. The last 7 copies are kept.",
