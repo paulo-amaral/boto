@@ -75,6 +75,7 @@ Todas as capturas usam dados fictícios.
 
 ## Recursos
 
+- **Notas:** post-its coloridos em cada projeto, para anotações que não são tarefas.
 - **Ícones:** escolha o ícone de cada projeto entre cerca de 1.900 do Lucide, com busca por nome ou tema.
 - **Quadros:** projetos, quadros, listas e cartões com etiquetas, cores, checklists, datas e descrição em Markdown. Arrastar e soltar, seleção múltipla, arquivar, agrupar por importância, filtros, busca e paleta de comandos.
 - **Referências:** arquivos e pastas locais, notas do Obsidian, issues e pull requests do GitHub e mensagens do Mail. O Boto guarda apenas ponteiros e nunca copia nem altera seus arquivos.

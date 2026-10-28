@@ -4,6 +4,9 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Added
+- Notes: each project has a space of sticky notes, free text on coloured squares for annotations that are not tasks. Open it with Notes in the board header. A deleted note comes back from Recently deleted, and Duplicate project copies the notes.
+
 ## [0.2.0] - 2026-10-27
 
 ### Added

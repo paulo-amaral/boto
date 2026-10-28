@@ -77,6 +77,7 @@ All screenshots use made-up sample data.
 
 **Boards**
 - Pick each project's icon from about 1,900 Lucide icons, with search by name or topic.
+- Sticky notes on every project, in colours, for annotations that are not tasks.
 - Projects, boards, lists and cards with labels, colours, checklists, due dates and a Markdown description.
 - Drag and drop between lists. Command-click to select several cards. Archive instead of delete.
 - Group by importance (High, Medium, Low), filter by label, list or due date, search, and a command palette.
