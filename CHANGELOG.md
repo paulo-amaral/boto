@@ -4,11 +4,18 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Changed
+- The ... menu in the board header holds only board options (show archived, add dated cards to Apple Calendar). The project options live in the project menu in the sidebar, so nothing is offered twice.
+
+### Security
+- Boto and `boto-mcp` refuse to open a database that holds data from a newer version, instead of migrating it and dropping that data.
+
 ### Added
 - Links in a card description are clickable. Boto finds web addresses, `www.` addresses, addresses with a path and e-mail addresses, and reads Markdown links as `[title](https://...)`. File names such as `README.md` stay plain text, and only web and mail links are ever opened. Click the text to edit it again.
 - Pasting into a description or a note keeps links copied from an e-mail or a web page, where the address is hidden behind a title: it is pasted as `[title](address)`, which shows as a link. Web pages are only read for their links and never loaded.
 - Notes use a small face, show their links as links, and can be found with search (⌘K). With Group by importance they sit in a row above the lanes.
 - MCP: `list_notes` and `create_note`, and `search` also finds notes.
+- Note text can be small or medium, from the Aa menu in the Notes header.
 - Notes: each project has a space of sticky notes, free text on coloured squares for annotations that are not tasks. Add one with Note in the board header: they sit in a Notes column before the lists. A deleted note comes back from Recently deleted, and Duplicate project copies the notes.
 
 ## [0.2.0] - 2026-10-27
