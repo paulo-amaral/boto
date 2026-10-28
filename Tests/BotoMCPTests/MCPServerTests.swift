@@ -86,7 +86,7 @@ final class MCPServerTests: XCTestCase {
     func testReadOnlyHidesAndRefusesEveryWrite() throws {
         let (server, _, _, list) = try makeServer(readOnly: true)
         let names = try XCTUnwrap((try send(server, "tools/list")["result"] as? [String: Any])?["tools"] as? [[String: Any]]).compactMap { $0["name"] as? String }
-        XCTAssertEqual(Set(names), ["list_projects", "get_board", "get_card", "get_card_activity", "list_labels", "search", "get_time_report"], "duplicate_project is a write tool")
+        XCTAssertEqual(Set(names), ["list_projects", "get_board", "get_card", "get_card_activity", "list_labels", "list_notes", "search", "get_time_report"], "duplicate_project and create_note are write tools")
         let reply = try send(server, "tools/call", ["name": "create_card", "arguments": ["list_id": list.publicId, "title": "x"]])
         XCTAssertNotNil(reply["error"], "a write tool does not exist in read-only mode")
         XCTAssertTrue(list.orderedCards.isEmpty)
@@ -223,6 +223,33 @@ final class MCPServerTests: XCTestCase {
         XCTAssertEqual(again.json["name"] as? String, "Client copy 2", "a copy never takes a name in use")
         XCTAssertEqual(list.orderedCards.count, 1, "the original is untouched")
         XCTAssertTrue(try call(server, "duplicate_project", ["project_id": "nope"]).isError)
+    }
+
+    func testNotesAreListedCreatedAndFound() throws {
+        let (server, project, _, _) = try makeServer()
+        let created = try call(server, "create_note", ["project_id": project.publicId, "text": "  The CFO prefers calls before 10:00  ", "color": "Blue"])
+        XCTAssertFalse(created.isError, created.text)
+        XCTAssertEqual(created.json["text"] as? String, "The CFO prefers calls before 10:00")
+        XCTAssertEqual(created.json["color"] as? String, "blue")
+
+        _ = try call(server, "create_note", ["project_id": project.publicId, "text": "Second"])
+        let listed = try call(server, "list_notes", ["project_id": project.publicId])
+        let notes = try XCTUnwrap(listed.json["notes"] as? [[String: Any]])
+        XCTAssertEqual(notes.map { $0["text"] as? String }, ["Second", "The CFO prefers calls before 10:00"], "newest first")
+
+        let found = try XCTUnwrap(try call(server, "search", ["query": "cfo"]).json["results"] as? [[String: Any]])
+        XCTAssertEqual(found.first?["type"] as? String, "note")
+        XCTAssertEqual(found.first?["project"] as? String, "Client")
+    }
+
+    func testNoteInputIsValidated() throws {
+        let (server, project, _, _) = try makeServer()
+        XCTAssertTrue(try call(server, "create_note", ["project_id": project.publicId, "text": "   "]).isError)
+        XCTAssertTrue(try call(server, "create_note", ["project_id": "nope", "text": "x"]).isError)
+        XCTAssertTrue(try call(server, "create_note", ["project_id": project.publicId, "text": String(repeating: "x", count: 20_001)]).isError)
+        XCTAssertTrue(try call(server, "create_note", ["project_id": project.publicId, "text": "x", "color": "magenta"]).isError)
+        XCTAssertTrue(project.liveNotes.isEmpty, "a refused note leaves nothing behind")
+        XCTAssertTrue(try call(server, "list_notes", ["project_id": "nope"]).isError)
     }
 
     func testSearchFindsCardsAcrossProjects() throws {

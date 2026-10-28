@@ -59,6 +59,8 @@ final class BotoTools {
                        required: ["card_id"], writes: false),
         ToolDefinition(name: "list_labels", description: "The labels of a board, with their colour and how many open cards carry each.",
                        properties: ["board_id": text("Board id.")], required: ["board_id"], writes: false),
+        ToolDefinition(name: "list_notes", description: "A project's sticky notes, newest first. Notes are free text for things to remember that are not tasks.",
+                       properties: ["project_id": text("Project id.")], required: ["project_id"], writes: false),
         ToolDefinition(name: "get_time_report", description: "Hours logged on a project between two dates, by day and by card.",
                        properties: ["project_id": text("Project id."), "from": text(day), "to": text(day)], required: ["project_id", "from", "to"], writes: false),
         ToolDefinition(name: "create_card", description: "Add a card at the end of a list.",
@@ -81,6 +83,10 @@ final class BotoTools {
                        required: ["card_id", "title"], writes: true),
         ToolDefinition(name: "set_checklist_item_completed", description: "Tick or untick a checklist item.",
                        properties: ["item_id": text("Checklist item id, from get_card."), "completed": flag("True when done.")], required: ["item_id", "completed"], writes: true),
+        ToolDefinition(name: "create_note", description: "Add a sticky note to a project, for something to remember that is not a task.",
+                       properties: ["project_id": text("Project id."), "text": text("The note."),
+                                    "color": ["type": "string", "enum": NoteColors.all.map { $0.name.lowercased() }, "description": "Note colour. Default: the next one in turn."]],
+                       required: ["project_id", "text"], writes: true),
         ToolDefinition(name: "duplicate_project", description: "Copy a project: boards, lists, labels and, unless structure_only, cards with their checklists and references. Hours, activity and calendar links stay with the original.",
                        properties: ["project_id": text("Project id."), "name": text("Name of the copy. Default: \"<name> copy\"."),
                                     "structure_only": flag("Copy only boards, lists and labels, as an empty template.")],
@@ -103,6 +109,8 @@ final class BotoTools {
         case "search": return try search(arguments)
         case "get_card_activity": return try cardActivity(arguments)
         case "list_labels": return try listLabels(arguments)
+        case "list_notes": return try listNotes(arguments)
+        case "create_note": return try createNote(arguments)
         case "get_time_report": return try timeReport(arguments)
         case "create_card": return try createCard(arguments)
         case "update_card": return try updateCard(arguments)
@@ -173,6 +181,7 @@ final class BotoTools {
             case .project(let project): ["type": "project", "id": project.publicId, "name": project.name]
             case .card(let card): compact(["type": "card", "id": card.publicId, "title": card.title,
                                            "list": card.list?.name, "project": card.list?.board?.project?.name])
+            case .note(let note): compact(["type": "note", "id": note.publicId, "text": String(note.text.prefix(200)), "project": note.project?.name])
             }
         }]
     }
@@ -197,6 +206,32 @@ final class BotoTools {
             compact(["id": label.publicId, "name": label.name, "colour": label.colourCode,
                      "open_cards": label.cards.filter { $0.deletedAt == nil && !$0.isArchived }.count])
         }]
+    }
+
+    private func noteSummary(_ note: Note) -> [String: Any] {
+        ["id": note.publicId, "text": note.text, "color": NoteColors.all.first { $0.hex == note.colorHex }?.name.lowercased() ?? note.colorHex]
+    }
+
+    private func listNotes(_ args: [String: Any]) throws -> Any {
+        let project = try findProject(try required(args, "project_id"))
+        return ["project": project.name, "notes": project.liveNotes.map(noteSummary)]
+    }
+
+    private func createNote(_ args: [String: Any]) throws -> Any {
+        try requireWritable()
+        let project = try findProject(try required(args, "project_id"))
+        let text = try limited(try required(args, "text"), Self.textLimit, "text")
+        let note = project.addNote(text: text)
+        if let name = try optional(args, "color", limit: 16)?.lowercased() {
+            guard let colour = NoteColors.all.first(where: { $0.name.lowercased() == name }) else {
+                project.notes.removeAll { $0 === note }
+                context.delete(note)
+                throw ToolError("color must be one of \(NoteColors.all.map { $0.name.lowercased() }.joined(separator: ", "))")
+            }
+            note.colorHex = colour.hex
+        }
+        try context.save()
+        return noteSummary(note)
     }
 
     private func timeReport(_ args: [String: Any]) throws -> Any {
