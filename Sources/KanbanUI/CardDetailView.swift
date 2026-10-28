@@ -290,18 +290,7 @@ struct CardDetailView: View {
     private var descriptionSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader("text.alignleft", "Description")
-            TextEditor(text: $card.details)
-                .font(Theme.font(14))
-                .scrollContentBackground(.hidden)
-                .padding(8)
-                .frame(minHeight: 110)
-                .overlay(alignment: .topLeading) {
-                    if card.details.isEmpty {
-                        Text("Add a more detailed description...").font(Theme.font(14)).foregroundStyle(Theme.muted)
-                            .padding(.leading, 13).padding(.top, 8).allowsHitTesting(false)
-                    }
-                }
-                .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(Theme.border))
+            DescriptionField(text: $card.details)
         }
     }
 
