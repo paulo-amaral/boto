@@ -12,6 +12,8 @@ struct RecentlyDeletedView: View {
     private var allLists: [BoardList]
     @Query(filter: #Predicate<Card> { $0.deletedAt != nil }, sort: [SortDescriptor(\Card.deletedAt, order: .reverse)])
     private var allCards: [Card]
+    @Query(filter: #Predicate<Note> { $0.deletedAt != nil }, sort: [SortDescriptor(\Note.deletedAt, order: .reverse)])
+    private var allNotes: [Note]
 
     private struct Item: Identifiable {
         let id: String
@@ -34,6 +36,9 @@ struct RecentlyDeletedView: View {
             Item(id: card.publicId, title: card.title, context: [card.list?.board?.project?.name, card.list?.name].compactMap { $0 }.joined(separator: " / "),
                  deletedAt: card.deletedAt) { card.deletedAt = nil }
         }
+        let noteItems = allNotes.filter(\.canRestore).map { note in
+            Item(id: note.publicId, title: note.title.isEmpty ? "Empty note" : note.title, context: note.project?.name, deletedAt: note.deletedAt) { note.deletedAt = nil }
+        }
         VStack(spacing: 0) {
             HStack {
                 Text("Recently deleted").font(Theme.font(16, weight: .semibold))
@@ -42,8 +47,8 @@ struct RecentlyDeletedView: View {
             }
             .padding(22)
 
-            if projectItems.isEmpty && listItems.isEmpty && cardItems.isEmpty {
-                Text("Nothing to restore. Deleted projects, lists and cards appear here, and each one can come back.")
+            if projectItems.isEmpty && listItems.isEmpty && cardItems.isEmpty && noteItems.isEmpty {
+                Text("Nothing to restore. Deleted projects, lists, cards and notes appear here, and each one can come back.")
                     .font(Theme.font(12)).foregroundStyle(Theme.muted)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                     .padding(22)
@@ -53,6 +58,7 @@ struct RecentlyDeletedView: View {
                         section("Projects", projectItems)
                         section("Lists", listItems)
                         section("Cards", cardItems)
+                        section("Notes", noteItems)
                     }
                     .padding(.horizontal, 22)
                     .padding(.bottom, 22)

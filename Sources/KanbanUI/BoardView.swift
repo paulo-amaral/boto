@@ -172,6 +172,7 @@ public struct BoardView: View {
     @State private var menuOpen = false
     @State private var showFlow = false
     @State private var showTime = false
+    @State private var showNotes = false
     @State private var calendarMessage: String?
     @AppStorage("groupByImportance") private var groupByImportance = false
     @Environment(\.isCompactWindow) private var compact
@@ -239,6 +240,7 @@ public struct BoardView: View {
             Button("OK") { calendarMessage = nil }
         } message: { Text(calendarMessage ?? "") }
         .sheet(isPresented: $showTime) { if let project = board.project { HoursView(project: project) } }
+        .sheet(isPresented: $showNotes) { if let project = board.project { ProjectNotesView(project: project) } }
     }
 
     private var header: some View {
@@ -277,6 +279,14 @@ public struct BoardView: View {
                     }
                     .buttonStyle(ToolbarButtonStyle(primary: false))
                     .help("Hours worked in this project")
+                    Button { showNotes = true } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "note.text")
+                            if !compact { Text("Notes") }
+                        }
+                    }
+                    .buttonStyle(ToolbarButtonStyle(primary: false))
+                    .help("Sticky notes for this project")
                 }
                 FilterButton(filter: $filter, labels: board.labels, lists: board.orderedLists, iconOnly: compact)
                 Button {

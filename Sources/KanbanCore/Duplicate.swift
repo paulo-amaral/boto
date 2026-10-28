@@ -2,11 +2,11 @@ import Foundation
 import SwiftData
 
 /// Duplicating a project copies what describes the work: boards, lists with their flow settings, labels, and cards with
-/// their checklists, references, colour, importance and dates. It leaves behind what belongs to the original's
+/// their checklists, references, colour, importance and dates, plus the project's notes. It leaves behind what belongs to the original's
 /// history: hours, activity, the Kaizen log, the Apple Calendar link (two cards cannot share one event) and the flow
 /// timestamps, which imported work also goes without, so the copy does not inflate throughput or cycle time.
 /// Deleted boards, lists and cards stay deleted. Archived ones stay archived. Without cards, only the structure is
-/// copied (boards, lists with their flow settings, labels), which makes an empty template.
+/// copied (boards, lists with their flow settings, labels), which makes an empty template: no cards and no notes.
 extension Project {
     /// "Name copy", then "Name copy 2", and so on, so a copy never takes a name that is already in use.
     public static func copyName(of name: String, among existing: [String]) -> String {
@@ -27,6 +27,7 @@ extension Project {
         // An icon the person picked is kept. An automatic one is left for the app to assign, so the copy looks different.
         if iconName.flatMap(ProjectIcons.lucideName(in:)) != nil { copy.iconName = iconName }
         for board in activeBoards { copy.boards.append(board.copied(withCards: withCards)) }
+        if withCards { for note in liveNotes.reversed() { copy.addNote(text: note.text).colorHex = note.colorHex } }
         return copy
     }
 }

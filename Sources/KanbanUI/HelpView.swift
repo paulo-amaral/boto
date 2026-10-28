@@ -37,6 +37,10 @@ struct HelpView: View {
             "Archive hides a card or a list without deleting it: use Archive in the card, Archive list in the list's ... menu, or the selection bar. Show archived, in the board's ... menu, brings them back into view so you can Restore them. Archived items are left out of search.",
             "In a list's ... menu, Paste cards from text creates one card per line and removes bullets, numbers and checkboxes.",
         ]),
+        ("Notes", [
+            "Notes, in the board header, opens a project's sticky notes: free text on coloured squares, newest first, for things that are not tasks, such as a call, a decision or a link.",
+            "New note adds one in the next colour; the dots under a note change its colour. The trash deletes a note, and Recently deleted brings it back. Notes belong to the project, so Duplicate project copies them.",
+        ]),
         ("References", [
             "In a card, add files, folders or notes, or drop them on the References box.",
             "A markdown file inside an Obsidian vault is stored as a note and opens in Obsidian. Other items open with the default app.",

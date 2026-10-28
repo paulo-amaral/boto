@@ -10,7 +10,7 @@ func makePublicId() -> String {
 public enum KanbanSchema {
     public static let models: [any PersistentModel.Type] = [
         Project.self, Board.self, BoardList.self, Card.self,
-        Label.self, Checklist.self, ChecklistItem.self, Reference.self, CardEvent.self,
+        Label.self, Checklist.self, ChecklistItem.self, Reference.self, CardEvent.self, Note.self,
     ]
 }
 
@@ -31,6 +31,8 @@ public final class Project {
     @Relationship(deleteRule: .cascade, inverse: \Board.project) public var boards: [Board] = []
     /// Time logged on the project itself, for work that has no card.
     @Relationship(deleteRule: .cascade, inverse: \TimeEntry.project) public var timeEntries: [TimeEntry] = []
+    /// Free-text sticky notes, for annotations that are not tasks.
+    @Relationship(deleteRule: .cascade, inverse: \Note.project) public var notes: [Note] = []
 
     public init(name: String) {
         self.publicId = makePublicId()
