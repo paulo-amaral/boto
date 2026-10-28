@@ -716,6 +716,32 @@ struct ChecklistItemRow: View {
     }
 }
 
+/// The square in front of an attachment: the type's icon, with a warning on it when the file is gone.
+private struct AttachmentTile: View {
+    let image: NSImage?
+    let symbol: String
+    let problem: Bool
+
+    var body: some View {
+        ZStack(alignment: .bottomTrailing) {
+            Group {
+                if let image {
+                    Image(nsImage: image).resizable().interpolation(.high).scaledToFit()
+                } else {
+                    Image(systemName: symbol).font(.system(size: 18)).foregroundStyle(Theme.mutedStrong)
+                }
+            }
+            .frame(width: 28, height: 28)
+            .frame(width: 40, height: 40)
+            .background(RoundedRectangle(cornerRadius: 8).fill(Theme.card))
+            .opacity(problem ? 0.55 : 1)
+            if problem {
+                Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 12)).foregroundStyle(Theme.warning).offset(x: 4, y: 4)
+            }
+        }
+    }
+}
+
 struct ReferenceRow: View {
     let reference: Reference
     let projectRoot: URL?
@@ -725,61 +751,80 @@ struct ReferenceRow: View {
 
     private var resolved: URL? { reference.resolvedURL(projectRoot: projectRoot) }
 
-    private var icon: String {
-        switch reference.kind {
-        case .file: "doc"
-        case .folder: "folder"
-        case .obsidianNote: "note.text"
-        case .githubIssue: "smallcircle.filled.circle"
-        case .githubPullRequest: "arrow.triangle.pull"
-        case .email: "envelope"
-        }
-    }
-
     private var title: String {
         reference.kind.isRemote
             ? (reference.remoteTitle ?? reference.displayPath)
             : URL(fileURLWithPath: reference.displayPath).lastPathComponent
     }
 
-    private var subtitle: String {
+    /// The second line: what it is, then where it is or what state it is in. A missing file says so instead.
+    private var detail: String {
         if let refreshMessage { return refreshMessage }
-        if reference.kind == .email {
-            return ["From email", reference.remoteState].compactMap { $0 }.joined(separator: " - ")
-        }
-        if reference.kind.isGitHub {
+        switch reference.kind {
+        case .email:
+            return [FileTypeInfo.name(for: reference), reference.remoteState].compactMap { $0 }.joined(separator: " - ")
+        case .githubIssue, .githubPullRequest:
             let slug = GitHubLink.parse(reference.displayPath)?.slug ?? reference.displayPath
-            return [slug, reference.remoteState].compactMap { $0 }.joined(separator: " - ")
+            return [FileTypeInfo.name(for: reference), slug, reference.remoteState].compactMap { $0 }.joined(separator: " - ")
+        case .file, .folder, .obsidianNote:
+            if resolved == nil { return "Missing: \(reference.displayPath)" }
+            // A file shows the folder it is in; a folder shows its own path.
+            let located = URL(fileURLWithPath: reference.displayPath)
+            let place = reference.vaultName.map { "Vault: \($0)" }
+                ?? ((reference.kind == .folder ? located.path : located.deletingLastPathComponent().path) as NSString).abbreviatingWithTildeInPath
+            return "\(FileTypeInfo.name(for: reference)) - \(place)"
         }
-        if resolved == nil { return "Missing: \(reference.displayPath)" }
-        return reference.vaultName.map { "Vault: \($0)" } ?? reference.displayPath
     }
 
-    private var isProblem: Bool { refreshMessage != nil || resolved == nil }
+    private var isProblem: Bool { refreshMessage != nil || (!reference.kind.isRemote && resolved == nil) }
+
+    private var canOpen: Bool { reference.kind.isRemote || resolved != nil }
 
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: icon).foregroundStyle(isProblem ? Theme.overdue : Theme.mutedStrong)
+        HStack(spacing: 12) {
+            AttachmentTile(image: FileTypeInfo.image(for: reference, resolved: resolved), symbol: FileTypeInfo.symbol(for: reference.kind), problem: isProblem)
+                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(Theme.font(13)).lineLimit(2)
-                Text(subtitle)
-                    .font(Theme.font(10))
+                Text(title).font(Theme.font(13, weight: .medium)).lineLimit(2)
+                Text(detail)
+                    .font(Theme.font(11))
                     .foregroundStyle(isProblem ? Theme.overdue : Theme.muted)
                     .lineLimit(1).truncationMode(.middle)
             }
-            Spacer()
-            Button("Open", action: open).disabled(resolved == nil)
+            Spacer(minLength: 8)
+            Button("Open", action: open).disabled(!canOpen).accessibilityLabel("Open \(title)")
             if reference.kind.isGitHub {
-                Button(action: refresh) { Image(systemName: "arrow.clockwise") }.help("Refresh from GitHub")
+                Button(action: refresh) { Image(systemName: "arrow.clockwise") }.help("Refresh from GitHub").accessibilityLabel("Refresh from GitHub")
             } else if reference.kind != .email {
                 Button { if let resolved { NSWorkspace.shared.activateFileViewerSelecting([resolved]) } } label: {
                     Image(systemName: "magnifyingglass")
                 }
                 .help("Reveal in Finder")
+                .accessibilityLabel("Reveal \(title) in Finder")
                 .disabled(resolved == nil)
             }
-            Button(action: onRemove) { Image(systemName: "xmark") }.buttonStyle(.plain).foregroundStyle(Theme.muted)
+            Button(action: onRemove) { Image(systemName: "xmark") }
+                .buttonStyle(.plain).foregroundStyle(Theme.muted)
+                .help("Remove this attachment. The file is not touched.")
+                .accessibilityLabel("Remove \(title)")
         }
+        .padding(.vertical, 4)
+        .contentShape(Rectangle())
+        // The row opens with a double-click, like a file in the Finder, and has the same actions in its menu.
+        .onTapGesture(count: 2) { if canOpen { open() } }
+        .contextMenu {
+            Button("Open", action: open).disabled(!canOpen)
+            if !reference.kind.isRemote, let resolved {
+                Button("Reveal in Finder") { NSWorkspace.shared.activateFileViewerSelecting([resolved]) }
+                Button("Copy path") {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(resolved.path, forType: .string)
+                }
+            }
+            Divider()
+            Button("Remove", role: .destructive, action: onRemove)
+        }
+        .accessibilityElement(children: .contain)
     }
 
     private func refresh() {

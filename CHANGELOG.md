@@ -7,6 +7,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 ### Changed
 - The ... menu in the board header holds only board options (show archived, add dated cards to Apple Calendar). The project options live in the project menu in the sidebar, so nothing is offered twice.
 
+- Attachments show the icon of their file type, the type's name ("PDF document", "Folder", "Obsidian note") and the folder they are in. A missing file keeps its icon with a warning. Double-click an attachment to open it, or right-click for Open, Reveal in Finder, Copy path and Remove.
+
 ### Security
 - Boto and `boto-mcp` refuse to open a database that holds data from a newer version, instead of migrating it and dropping that data.
 
