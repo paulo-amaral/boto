@@ -63,6 +63,21 @@ struct FlowLayout: Layout {
     }
 }
 
+/// How much room the board has. Regular shows every button with its text and lists at full width; compact drops the
+/// text and narrows the lists; narrow turns the lists into one column and moves the secondary buttons into the menu.
+enum BoardTier: Equatable {
+    case regular, compact, narrow
+
+    /// The widest toolbar (every label) plus a title and the margins needs about 1,040 points; the icon-only toolbar
+    /// plus a title fits down to about 600.
+    static let regularMinimum: CGFloat = 1040
+    static let compactMinimum: CGFloat = 600
+
+    init(width: CGFloat) {
+        self = width >= Self.regularMinimum ? .regular : (width >= Self.compactMinimum ? .compact : .narrow)
+    }
+}
+
 /// True when the window is narrow: the sidebar folds away, toolbars drop their text and lists get narrower.
 private struct CompactWindowKey: EnvironmentKey { static let defaultValue = false }
 

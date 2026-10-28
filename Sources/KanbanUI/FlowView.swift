@@ -173,7 +173,7 @@ struct FlowView: View {
                 .padding(.bottom, 22)
             }
         }
-        .frame(width: 620, height: 700)
+        .frame(minWidth: 520, idealWidth: 620, minHeight: 480, idealHeight: 700)
         .foregroundStyle(Theme.text)
         .background(Theme.background)
         .preferredColorScheme(.dark)

@@ -21,7 +21,7 @@ struct HelpView: View {
             "Duplicate project, in the project menu, makes a copy with the same boards, lists, labels, checklists and cards, and opens it. Hours, activity, the Kaizen log and Apple Calendar links stay with the original, so the copy starts without history. Duplicate without cards copies only the structure (boards, lists with their limits and policies, labels), an empty template for the next engagement.",
             "The project menu opens with a right-click on a project in the sidebar. It has Change icon, Duplicate project, Duplicate without cards, Edit root folder, Archive project, Add to favorites and Delete project. The collapsed sidebar shows the project icon. Favorites are listed first. Archived projects are hidden, and left out of search, until you click the archive icon next to PROJECTS.",
             "The root folder is usually the client folder or your Obsidian vault. Boto keeps a link to it and never copies your files. Set, change or reveal it from the project menu (right-click the project in the sidebar).",
-            "Collapse the sidebar with the button at its top; it keeps one tile per project. In a window narrower than 700 points the kanban columns become one vertical list, with each list under the previous one. In a window narrower than 900 points the sidebar collapses by itself, the buttons in the board header lose their text, and lists get narrower. Rename a project or a list by double-clicking its name.",
+            "Collapse the sidebar with the button at its top; it keeps one tile per project. The board adapts to the room it has, not only to the window: when it is wide every button shows its text; when it is narrower the buttons show only their icons and the lists get narrower; when it is very narrow the lists stack in one column, and Group by importance, Flow and Hours move into the ... menu. In a window narrower than 900 points the sidebar collapses by itself. Rename a project or a list by double-clicking its name.",
         ]),
         ("Cards", [
             "A card opens in its own window, so you can drag it aside (by its title bar) and keep the board in view while you edit. Clicking the same card again brings its window forward.",
@@ -153,7 +153,7 @@ struct HelpView: View {
                 .padding(.bottom, 22)
             }
         }
-        .frame(width: 520, height: 600)
+        .frame(minWidth: 420, idealWidth: 520, minHeight: 400, idealHeight: 600)
         .foregroundStyle(Theme.text)
         .background(Theme.background)
         .preferredColorScheme(.dark)

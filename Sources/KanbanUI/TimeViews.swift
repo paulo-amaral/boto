@@ -312,7 +312,7 @@ struct HoursView: View {
 
             if showingReport { TimeReportView(project: project) } else { TimesheetView(project: project) }
         }
-        .frame(width: 820, height: 620)
+        .frame(minWidth: 760, idealWidth: 820, minHeight: 440, idealHeight: 620)
         .foregroundStyle(Theme.text)
         .background(Theme.background)
         .preferredColorScheme(.dark)

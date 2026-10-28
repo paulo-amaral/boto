@@ -9,6 +9,8 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 - Attachments show the icon of their file type, the type's name ("PDF document", "Folder", "Obsidian note") and the folder they are in. A missing file keeps its icon with a warning. Double-click an attachment to open it, or right-click for Open, Reveal in Finder, Copy path and Remove.
 
+- The board adapts to the room it has, not only to the window size: every button with its text when wide, icons only when narrower, and one column of lists with Group by importance, Flow and Hours in the ... menu when very narrow. The Hours, Flow and Help windows can be resized.
+
 ### Security
 - Boto and `boto-mcp` refuse to open a database that holds data from a newer version, instead of migrating it and dropping that data.
 

@@ -170,8 +170,17 @@ public struct BoardView: View {
     @State private var noteFocusId: String?
     @State private var calendarMessage: String?
     @AppStorage("groupByImportance") private var groupByImportance = false
-    @Environment(\.isCompactWindow) private var compact
-    @Environment(\.stacksBoard) private var stacksBoard
+    @Environment(\.isCompactWindow) private var windowIsCompact
+    @Environment(\.stacksBoard) private var windowStacks
+    @State private var boardWidth: CGFloat = 0
+
+    /// The room the board itself has, which is what the layout depends on: the window minus the sidebar, open or not.
+    /// Until the first measurement it follows the window, so there is no flash of the wrong layout.
+    private var tier: BoardTier {
+        boardWidth > 0 ? BoardTier(width: boardWidth) : (windowStacks ? .narrow : (windowIsCompact ? .compact : .regular))
+    }
+    private var compact: Bool { tier != .regular }
+    private var stacksBoard: Bool { tier == .narrow }
 
     private var visibleLists: [BoardList] { board.visibleLists(showArchived: showArchived).filter(filter.showsList) }
 
@@ -226,6 +235,13 @@ public struct BoardView: View {
             .padding(compact ? 16 : 32)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
+        .background(GeometryReader { proxy in
+            Color.clear
+                .onAppear { boardWidth = proxy.size.width }
+                .onChange(of: proxy.size.width) { boardWidth = proxy.size.width }
+        })
+        .environment(\.isCompactWindow, compact)
+        .environment(\.stacksBoard, stacksBoard)
         .overlay(alignment: .bottom) {
             if !selectedCards.isEmpty {
                 BulkActionBar(cards: selectedCards, lists: board.orderedLists) { selection = [] }
@@ -251,6 +267,7 @@ public struct BoardView: View {
             Spacer(minLength: 8)
             // Keep the buttons at their natural width; the title is the part that gives way and truncates.
             HStack(spacing: 8) {
+                if !stacksBoard {
                 Button { groupByImportance.toggle() } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "rectangle.split.1x2")
@@ -276,6 +293,9 @@ public struct BoardView: View {
                     }
                     .buttonStyle(ToolbarButtonStyle(primary: false))
                     .help("Hours worked in this project")
+                    }
+                }
+                if board.project != nil {
                     Button { noteFocusId = board.project?.addNote().publicId } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "note.text.badge.plus")
@@ -332,9 +352,17 @@ public struct BoardView: View {
     }
 
     private var menuEntries: [DropdownEntry] {
-        var entries = [DropdownEntry(icon: "eye", title: "Show archived cards and lists", checked: showArchived) {
+        var entries: [DropdownEntry] = []
+        // In the narrow tier the toolbar has no room for these buttons, so they are offered here instead, never in both.
+        if stacksBoard {
+            entries.append(DropdownEntry(icon: "rectangle.split.1x2", title: "Group by importance", checked: groupByImportance) { groupByImportance.toggle() })
+            entries.append(DropdownEntry(icon: "chart.xyaxis.line", title: "Flow metrics") { showFlow = true })
+            if board.project != nil { entries.append(DropdownEntry(icon: "hourglass", title: "Hours") { showTime = true }) }
+            entries.append(.divider)
+        }
+        entries.append(DropdownEntry(icon: "eye", title: "Show archived cards and lists", checked: showArchived) {
             showArchived.toggle()
-        }]
+        })
         entries.append(DropdownEntry(icon: "calendar.badge.plus", title: "Add dated cards to Apple Calendar", action: addDatedCardsToCalendar))
         return entries
     }
