@@ -9,6 +9,10 @@ public final class MCPServer {
     public static let latestVersion = "2025-06-18"
     public static let supportedVersions = ["2025-06-18", "2025-03-26", "2024-11-05"]
 
+    /// The version of the app this server ships in. A command line tool inside `Boto.app` finds the app's Info.plist as
+    /// its main bundle; anywhere else (tests, a bare build) it says so.
+    static var version: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev" }
+
     private let tools: BotoTools
 
     public init(context: ModelContext, readOnly: Bool = false) {
@@ -34,7 +38,7 @@ public final class MCPServer {
             return result(id: id, [
                 "protocolVersion": Self.supportedVersions.contains(requested) ? requested : Self.latestVersion,
                 "capabilities": ["tools": [String: Any]()],
-                "serverInfo": ["name": "boto", "version": "0.2.0"],
+                "serverInfo": ["name": "boto", "version": Self.version],
                 "instructions": "Boto is a personal Kanban app. Ids come from list_projects, get_board and search. "
                     + "Nothing is ever deleted through these tools; restore and delete happen in the app. "
                     + "When started without --allow-writes the server only reads, and the write tools are not listed.",

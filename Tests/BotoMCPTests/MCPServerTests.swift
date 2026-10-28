@@ -45,6 +45,9 @@ final class MCPServerTests: XCTestCase {
         XCTAssertEqual(result["protocolVersion"] as? String, "2025-03-26")
         XCTAssertNotNil((result["capabilities"] as? [String: Any])?["tools"])
         XCTAssertEqual((result["serverInfo"] as? [String: Any])?["name"] as? String, "boto")
+        let version = try XCTUnwrap((result["serverInfo"] as? [String: Any])?["version"] as? String)
+        XCTAssertFalse(version.isEmpty)
+        XCTAssertNotEqual(version, "0.2.0", "the version is read, not written into the code")
     }
 
     func testAnUnsupportedVersionGetsTheLatestOne() throws {
