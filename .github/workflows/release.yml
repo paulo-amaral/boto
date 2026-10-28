@@ -41,4 +41,8 @@ jobs:
         run: |
           awk -v v="${TAG#v}" 'index($0, "## [" v "]") == 1 {f=1; next} /^## \[/ {f=0} f' CHANGELOG.md > notes.md
           test -s notes.md || { echo "CHANGELOG.md has no section for ${TAG#v}"; exit 1; }
+          # The notes carry a Portuguese copy under the English text.
+          awk -v v="${TAG#v}" 'index($0, "## [" v "]") == 1 {f=1; next} /^## \[/ {f=0} f' CHANGELOG.pt-BR.md > notes-pt.md
+          test -s notes-pt.md || { echo "CHANGELOG.pt-BR.md has no section for ${TAG#v}"; exit 1; }
+          { echo; echo "---"; echo; echo "## Em português"; cat notes-pt.md; } >> notes.md
           gh release create "$TAG" "Boto-${TAG#v}.zip" "Boto-${TAG#v}.zip.sha256" --verify-tag --title "Boto ${TAG#v}" --notes-file notes.md

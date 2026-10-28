@@ -17,6 +17,8 @@ jobs:
         with:
           persist-credentials: false
       - run: bash Scripts/secret-scan.sh --all
+      - name: Check that both changelogs cover every version
+        run: bash Scripts/check-changelogs.sh
   pr-title:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
