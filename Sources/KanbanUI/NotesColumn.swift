@@ -17,6 +17,7 @@ struct NotesColumn: View {
             HStack {
                 Text("Notes").font(Theme.font(13, weight: .medium)).foregroundStyle(Theme.text).padding(.leading, 8)
                 Spacer()
+                NoteSizeMenu()
                 Button { focusId = project.addNote().publicId } label: { Image(systemName: "plus") }
                     .buttonStyle(.plain)
                     .foregroundStyle(Theme.muted)
@@ -57,6 +58,7 @@ struct NotesStrip: View {
                     .foregroundStyle(Theme.muted)
                     .help("New note")
                     .accessibilityLabel("New note")
+                NoteSizeMenu()
             }
             ScrollView(.horizontal) {
                 HStack(alignment: .top, spacing: 12) {
@@ -71,13 +73,36 @@ struct NotesStrip: View {
 }
 
 enum NoteStyle {
-    /// The note face: the small step of the type scale.
-    static let fontSize: CGFloat = 12
+    /// The two faces a note can use, both steps of the type scale. Small is the default, so a note holds more.
+    static let sizes: [(name: String, size: Double)] = [("Small", 12), ("Medium", 14)]
+    static let storageKey = "noteFontSize"
+}
+
+/// Chooses the text size of every note. It lives in the column and the row so it sits next to what it changes.
+struct NoteSizeMenu: View {
+    @AppStorage(NoteStyle.storageKey) private var size: Double = NoteStyle.sizes[0].size
+
+    var body: some View {
+        Menu {
+            ForEach(NoteStyle.sizes, id: \.size) { option in
+                Button { size = option.size } label: {
+                    if size == option.size { Label(option.name, systemImage: "checkmark") } else { Text(option.name) }
+                }
+            }
+        } label: { Image(systemName: "textformat.size") }
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .foregroundStyle(Theme.muted)
+        .help("Note text size")
+        .accessibilityLabel("Note text size")
+    }
 }
 
 /// One sticky note. The colour row and the delete button are always visible, so nothing depends on hovering.
 struct NoteCard: View {
     @Bindable var note: Note
+    @AppStorage(NoteStyle.storageKey) private var fontSize: Double = NoteStyle.sizes[0].size
     @Binding var focusId: String?
     @State private var focusToken = 0
 
@@ -86,7 +111,7 @@ struct NoteCard: View {
             // A small face, so a note holds more. A fixed height makes it a post-it and not a panel that grows to fill the
             // column; long text scrolls inside.
             LinkedTextField(
-                text: $note.text, placeholder: "Write a note...", accessibilityLabel: "Note text", fontSize: NoteStyle.fontSize,
+                text: $note.text, placeholder: "Write a note...", accessibilityLabel: "Note text", fontSize: CGFloat(fontSize),
                 textColor: Theme.onLight, placeholderColor: Theme.onLight.opacity(0.7), linkColor: Theme.linkOnLight, showsEditHint: false, focusToken: focusToken
             )
             .frame(height: 112)
