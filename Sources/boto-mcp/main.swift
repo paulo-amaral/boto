@@ -16,6 +16,7 @@ func fail(_ message: String) -> Never {
 func serve() {
     let container: ModelContainer
     do {
+        try StoreCompatibility.check(store: try BotoPaths.storeURL())
         container = try ModelContainer(for: Schema(KanbanSchema.models), configurations: ModelConfiguration(url: try BotoPaths.storeURL()))
     } catch {
         fail("could not open the Boto database: \(error)")
