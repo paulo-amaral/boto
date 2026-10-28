@@ -13,6 +13,7 @@ final class SearchTests: XCTestCase {
             switch $0 {
             case .project(let project): "P:\(project.name)"
             case .card(let card): "C:\(card.title)"
+            case .note(let note): "N:\(note.title)"
             }
         }
     }

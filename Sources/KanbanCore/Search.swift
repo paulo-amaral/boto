@@ -3,16 +3,18 @@ import Foundation
 public enum SearchResult: Identifiable {
     case project(Project)
     case card(Card)
+    case note(Note)
 
     public var id: String {
         switch self {
         case .project(let project): "project-\(project.publicId)"
         case .card(let card): "card-\(card.publicId)"
+        case .note(let note): "note-\(note.publicId)"
         }
     }
 }
 
-/// Matches project names and card titles, descriptions and label names.
+/// Matches project names, card titles, descriptions and label names, and the text of sticky notes.
 public enum Search {
     public static func results(for query: String, in projects: [Project], limit: Int = 20) -> [SearchResult] {
         let needle = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -22,6 +24,9 @@ public enum Search {
         for project in projects where project.deletedAt == nil && !project.isArchived {
             if let score = score(project.name, needle) {
                 scored.append((score, false, project.name, .project(project)))
+            }
+            for note in project.liveNotes {
+                if let best = score(note.text, needle) { scored.append((best, true, note.title, .note(note))) }
             }
             for board in project.activeBoards {
                 for list in board.visibleLists(showArchived: false) {

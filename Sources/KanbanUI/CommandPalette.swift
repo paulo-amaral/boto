@@ -70,6 +70,8 @@ struct CommandPalette: View {
             ("folder", project.name, project.rootFolderURL?.path)
         case .card(let card):
             ("doc.text", card.title, [card.list?.board?.project?.name, card.list?.name].compactMap { $0 }.joined(separator: " / "))
+        case .note(let note):
+            ("note.text", note.title.isEmpty ? "Empty note" : note.title, note.project?.name)
         }
         return HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon).foregroundStyle(Theme.muted).padding(.top, 2)

@@ -22,6 +22,12 @@ final class ThemeContrastTests: XCTestCase {
         }
     }
 
+    func testLinksReadOnEveryNoteColour() throws {
+        for colour in NoteColors.all {
+            XCTAssertGreaterThanOrEqual(try contrast(Theme.StatusHex.linkOnLight, colour.hex), 4.5, colour.name)
+        }
+    }
+
     func testPrimaryButtonTextReadsOnItsFill() throws {
         XCTAssertGreaterThanOrEqual(try contrast(Theme.StatusHex.onLight, Theme.StatusHex.light), 4.5)
     }

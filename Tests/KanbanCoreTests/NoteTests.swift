@@ -94,3 +94,30 @@ final class NoteTests: XCTestCase {
         XCTAssertTrue(template.liveNotes.isEmpty)
     }
 }
+
+@MainActor
+final class NoteSearchTests: XCTestCase {
+    func testSearchFindsNotesByTheirText() throws {
+        let container = try ModelContainer(for: Schema(KanbanSchema.models), configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let project = Project(name: "Client")
+        container.mainContext.insert(project)
+        project.addNote(text: "The CFO prefers calls before 10:00")
+        project.addNote(text: "Deleted reminder about the CFO").deletedAt = Date()
+
+        let results = Search.results(for: "cfo", in: [project])
+        XCTAssertEqual(results.count, 1, "a deleted note is not found")
+        guard case .note(let note) = try XCTUnwrap(results.first) else { return XCTFail("expected a note") }
+        XCTAssertEqual(note.text, "The CFO prefers calls before 10:00")
+        XCTAssertTrue(Search.results(for: "zzz", in: [project]).isEmpty)
+    }
+
+    func testProjectsStillComeBeforeNotesAndCards() throws {
+        let container = try ModelContainer(for: Schema(KanbanSchema.models), configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let project = Project(name: "Budget review")
+        container.mainContext.insert(project)
+        project.addNote(text: "Budget idea")
+        let results = Search.results(for: "budget", in: [project])
+        guard case .project = try XCTUnwrap(results.first) else { return XCTFail("the project should lead") }
+        XCTAssertEqual(results.count, 2)
+    }
+}

@@ -201,6 +201,9 @@ public struct BoardView: View {
             VStack(alignment: .leading, spacing: 24) {
                 header
                 if groupByImportance {
+                    if let project = board.project, !project.liveNotes.isEmpty {
+                        NotesStrip(project: project, focusId: $noteFocusId)
+                    }
                     ImportanceBoardView(board: board, filter: filter, showArchived: showArchived, selection: $selection)
                 } else if stacksBoard {
                     // A narrow window shows the lists one under another, like a plain list, instead of side by side.

@@ -295,6 +295,8 @@ public struct ProjectsView: View {
         case .card(let card):
             if let project = card.list?.board?.project { selectedId = project.publicId }
             openWindow(value: CardWindowID(cardId: card.publicId))
+        case .note(let note):
+            if let project = note.project { selectedId = project.publicId }
         }
     }
 

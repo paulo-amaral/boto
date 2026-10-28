@@ -43,26 +43,52 @@ struct NotesColumn: View {
     }
 }
 
+/// The same notes as a row, for the importance view, which has no room for a column at the start.
+struct NotesStrip: View {
+    let project: Project
+    @Binding var focusId: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Text("Notes").font(Theme.font(13, weight: .medium)).foregroundStyle(Theme.text)
+                Button { focusId = project.addNote().publicId } label: { Image(systemName: "plus") }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(Theme.muted)
+                    .help("New note")
+                    .accessibilityLabel("New note")
+            }
+            ScrollView(.horizontal) {
+                HStack(alignment: .top, spacing: 12) {
+                    ForEach(project.liveNotes, id: \.publicId) { NoteCard(note: $0, focusId: $focusId).frame(width: 240) }
+                }
+                .padding(.vertical, 4)
+                .padding(.horizontal, 2)
+            }
+            .scrollIndicators(.hidden)
+        }
+    }
+}
+
+enum NoteStyle {
+    /// The note face: the small step of the type scale.
+    static let fontSize: CGFloat = 12
+}
+
 /// One sticky note. The colour row and the delete button are always visible, so nothing depends on hovering.
 struct NoteCard: View {
     @Bindable var note: Note
     @Binding var focusId: String?
-    @FocusState private var focused: Bool
+    @State private var focusToken = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ZStack(alignment: .topLeading) {
-                if note.text.isEmpty {
-                    Text("Write a note...").font(Theme.font(14)).foregroundStyle(Theme.onLight.opacity(0.7))
-                        .padding(.top, 8).padding(.leading, 5).allowsHitTesting(false)
-                }
-                TextEditor(text: $note.text)
-                    .font(Theme.font(14))
-                    .scrollContentBackground(.hidden)
-                    .focused($focused)
-                    .accessibilityLabel("Note text")
-            }
-            // A fixed height, so a note is a post-it and not a panel that grows to fill the column; long text scrolls inside.
+            // A small face, so a note holds more. A fixed height makes it a post-it and not a panel that grows to fill the
+            // column; long text scrolls inside.
+            LinkedTextField(
+                text: $note.text, placeholder: "Write a note...", accessibilityLabel: "Note text", fontSize: NoteStyle.fontSize,
+                textColor: Theme.onLight, placeholderColor: Theme.onLight.opacity(0.7), linkColor: Theme.linkOnLight, showsEditHint: false, focusToken: focusToken
+            )
             .frame(height: 112)
 
             HStack(spacing: 6) {
@@ -90,7 +116,7 @@ struct NoteCard: View {
         .background(RoundedRectangle(cornerRadius: 4).fill(Color(hex: note.colorHex)).shadow(color: .black.opacity(0.35), radius: 6, y: 3))
         .onChange(of: note.text) { note.updatedAt = Date() }
         .onAppear {
-            if focusId == note.publicId { focused = true; focusId = nil }
+            if focusId == note.publicId { focusToken += 1; focusId = nil }
         }
     }
 }

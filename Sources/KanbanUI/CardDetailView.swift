@@ -290,7 +290,9 @@ struct CardDetailView: View {
     private var descriptionSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader("text.alignleft", "Description")
-            DescriptionField(text: $card.details)
+            LinkedTextField(text: $card.details, placeholder: "Add a more detailed description...", accessibilityLabel: "Description")
+                .frame(minHeight: 110, alignment: .topLeading)
+                .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(Theme.border))
         }
     }
 

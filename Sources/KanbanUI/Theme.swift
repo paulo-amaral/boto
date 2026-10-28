@@ -38,6 +38,8 @@ public enum Theme {
         static let info = "#579dff"
         /// Fill and text of the white primary button and of text on light label colours.
         static let onLight = "#161616"
+        /// Link colour on the pastel paper of a sticky note, where the light blue used on the dark theme would not read.
+        static let linkOnLight = "#1d4ed8"
         static let light = "#ffffff"
     }
     public static let danger = Color(hex: StatusHex.danger)
@@ -45,6 +47,7 @@ public enum Theme {
     public static let success = Color(hex: StatusHex.success)
     public static let info = Color(hex: StatusHex.info)
     public static let onLight = Color(hex: StatusHex.onLight)
+    public static let linkOnLight = Color(hex: StatusHex.linkOnLight)
     public static let light = Color(hex: StatusHex.light)
 
     /// Same hues as the board's other status colours: red, gold and blue read on every surface.
