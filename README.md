@@ -132,7 +132,7 @@ The server only reads by default. Add `"args": ["--allow-writes"]` to let the as
 
 | Reading | Writing (needs `--allow-writes`) |
 |---|---|
-| `list_projects`, `get_board`, `get_card`, `get_card_activity`, `list_labels`, `search`, `get_time_report` | `create_card`, `update_card`, `move_card`, `set_card_archived`, `duplicate_project`, `add_checklist_item`, `set_checklist_item_completed`, `log_time` |
+| `list_projects`, `get_board`, `get_card`, `get_card_activity`, `list_labels`, `list_notes`, `search`, `get_time_report` | `create_card`, `update_card`, `move_card`, `set_card_archived`, `duplicate_project`, `create_note`, `add_checklist_item`, `set_checklist_item_completed`, `log_time` |
 
 - There is no delete tool. Deleting and restoring stay in the app, under Recently deleted.
 - A card that is on your Apple Calendar cannot be completed or archived from here, because that removes its event and only the app holds the calendar permission. Do it in the app.

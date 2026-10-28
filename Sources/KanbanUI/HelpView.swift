@@ -27,7 +27,7 @@ struct HelpView: View {
             "A card opens in its own window, so you can drag it aside (by its title bar) and keep the board in view while you edit. Clicking the same card again brings its window forward.",
             "Importance (High, Medium, Low) is set from the Importance button in the card and shows as a coloured ! on the card. Group by importance, in the board header, lays the board out in lanes by importance with your lists as columns. Dropping a card in a cell moves it to that list and gives it that importance.",
             "Apple Calendar: in a card's Dates, tick Add to Apple Calendar to put the due date in a calendar named Boto. Optionally set a time and an alert; without a time the event lasts all day and alerts at 9:00. Completing or archiving the card removes its event. Boto's ... menu has Add dated cards to Apple Calendar for every open card with a date. The sync is one way: edits made in Calendar are overwritten.",
-            "In a description, links are clickable: type or paste an address (https://..., www..., an address with a path, or an e-mail), or write [title](https://...). Click away to see them as links and click the text, or Edit, to change it. Only web and mail links open, and a name like README.md stays text.",
+            "In a description, links are clickable: type or paste an address (https://..., www..., an address with a path, or an e-mail), or write [title](https://...). Click away to see them as links and click the text, or Edit, to change it. When you copy from an e-mail or a web page, a link whose address is hidden behind a title is kept as [title](address) when you paste into a description or a note. Only web and mail links open, and a name like README.md stays text.",
             "The round box beside a card's title marks it complete; completed cards show a green check on the board.",
             "You can drag the window by any empty part of it, not only by the title bar.",
             "Click a card to open it. The main column has the title, description, checklists, references and the activity feed with a comment box (⌘↩ sends). The side panel sets the list, labels, due date and colour.",
@@ -40,7 +40,7 @@ struct HelpView: View {
         ]),
         ("Notes", [
             "Note, in the board header, adds a sticky note to the board: free text on a coloured square, for something worth remembering that is not a task, such as a call, a decision or a link. Notes sit in a Notes column before the lists, newest first, and the column appears when there is a note.",
-            "Type in a note to edit it. The dots under a note change its colour; the + in the column adds another. The trash deletes a note, and Recently deleted brings it back. Notes belong to the project, so Duplicate project copies them. Grouping by importance does not show notes.",
+            "Type in a note to edit it; notes use a small face so they hold more, and links in them open like links in a description. The dots under a note change its colour; the + in the column adds another. The trash deletes a note, and Recently deleted brings it back. Notes belong to the project, so Duplicate project copies them. With Group by importance, the notes sit in a row above the lanes.",
         ]),
         ("References", [
             "In a card, add files, folders or notes, or drop them on the References box.",
@@ -88,7 +88,7 @@ struct HelpView: View {
         ]),
         ("Find", [
             "Filter narrows the board by label, list and due date. A badge shows how many filters are active.",
-            "Search (⌘K) looks through project names and card titles, descriptions and labels.",
+            "Search (⌘K) looks through project names, card titles, descriptions and labels, and the text of notes. Choosing a note opens its project.",
         ]),
     ]
 
