@@ -1,3 +1,4 @@
+import SQLite3
 import SwiftData
 import XCTest
 @testable import KanbanCore
@@ -23,7 +24,7 @@ final class StoreCompatibilityTests: XCTestCase {
     func testAStoreFromThisVersionOpens() throws {
         let url = try makeStore()
         XCTAssertNoThrow(try StoreCompatibility.check(store: url))
-        XCTAssertTrue(try XCTUnwrap(StoreCompatibility.storedEntities(at: url)).contains("Note"))
+        XCTAssertTrue(try XCTUnwrap(try StoreCompatibility.storedEntities(at: url)).contains("Note"))
     }
 
     func testAStoreWithAnEntityThisVersionLacksIsRefused() throws {
@@ -33,6 +34,18 @@ final class StoreCompatibilityTests: XCTestCase {
             XCTAssertEqual((error as? StoreCompatibility.NewerStore)?.entities, ["Note"])
             XCTAssertTrue(error.localizedDescription.contains("newer version of Boto"))
         }
+    }
+
+    func testALockedDatabaseIsRefusedNotWavedThrough() throws {
+        let url = try makeStore()
+        var writer: OpaquePointer?
+        XCTAssertEqual(sqlite3_open_v2(url.path, &writer, SQLITE_OPEN_READWRITE, nil), SQLITE_OK)
+        defer { sqlite3_close(writer) }
+        // An exclusive lock, as a writer in the middle of a rollback-journal commit holds.
+        sqlite3_exec(writer, "PRAGMA journal_mode=DELETE", nil, nil, nil)
+        XCTAssertEqual(sqlite3_exec(writer, "BEGIN EXCLUSIVE", nil, nil, nil), SQLITE_OK)
+        defer { sqlite3_exec(writer, "ROLLBACK", nil, nil, nil) }
+        XCTAssertThrowsError(try StoreCompatibility.check(store: url)) { XCTAssertTrue($0 is StoreCompatibility.Busy) }
     }
 
     func testRefusingLeavesTheStoreUntouched() throws {
@@ -50,12 +63,12 @@ final class StoreCompatibilityTests: XCTestCase {
 
     func testNoStoreAndAnUnreadableFileAreNotAnError() throws {
         let missing = FileManager.default.temporaryDirectory.appendingPathComponent("nope-\(UUID().uuidString).store")
-        XCTAssertNil(StoreCompatibility.storedEntities(at: missing))
+        XCTAssertNil(try StoreCompatibility.storedEntities(at: missing))
         XCTAssertNoThrow(try StoreCompatibility.check(store: missing))
         let junk = FileManager.default.temporaryDirectory.appendingPathComponent("junk-\(UUID().uuidString).store")
         try Data("not a database".utf8).write(to: junk)
         addTeardownBlock { try? FileManager.default.removeItem(at: junk) }
-        XCTAssertNil(StoreCompatibility.storedEntities(at: junk))
+        XCTAssertNil(try StoreCompatibility.storedEntities(at: junk))
         XCTAssertNoThrow(try StoreCompatibility.check(store: junk))
     }
 }

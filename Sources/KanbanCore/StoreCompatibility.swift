@@ -15,16 +15,30 @@ public enum StoreCompatibility {
         }
     }
 
-    /// The entities the store was last saved with, or nil when there is no store yet or it cannot be read.
-    public static func storedEntities(at url: URL) -> Set<String>? {
+    /// The database is in use by another process and could not be read in time. The check must not pass on a guess.
+    public struct Busy: LocalizedError {
+        public var errorDescription: String? { "The Boto database is busy, so Boto could not check it. Close the other Boto window and try again." }
+    }
+
+    /// The entities the store was last saved with, or nil when there is no store yet or it is not a Boto database.
+    /// Another process that has the store open (the app, while `boto-mcp` starts) can hold a lock for a moment, so a
+    /// busy database is waited for, and refused when the wait runs out rather than treated as "nothing to check".
+    public static func storedEntities(at url: URL) throws -> Set<String>? {
         guard FileManager.default.fileExists(atPath: url.path) else { return nil }
         var database: OpaquePointer?
-        guard sqlite3_open_v2(url.path, &database, SQLITE_OPEN_READONLY, nil) == SQLITE_OK else { sqlite3_close(database); return nil }
+        let opened = sqlite3_open_v2(url.path, &database, SQLITE_OPEN_READONLY, nil)
         defer { sqlite3_close(database) }
+        if opened == SQLITE_BUSY || opened == SQLITE_LOCKED { throw Busy() }
+        guard opened == SQLITE_OK else { return nil }
+        sqlite3_busy_timeout(database, 3000)
         var statement: OpaquePointer?
-        guard sqlite3_prepare_v2(database, "select Z_PLIST from Z_METADATA limit 1", -1, &statement, nil) == SQLITE_OK else { return nil }
+        let prepared = sqlite3_prepare_v2(database, "select Z_PLIST from Z_METADATA limit 1", -1, &statement, nil)
         defer { sqlite3_finalize(statement) }
-        guard sqlite3_step(statement) == SQLITE_ROW, let bytes = sqlite3_column_blob(statement, 0) else { return nil }
+        if prepared == SQLITE_BUSY || prepared == SQLITE_LOCKED { throw Busy() }
+        guard prepared == SQLITE_OK else { return nil }
+        let stepped = sqlite3_step(statement)
+        if stepped == SQLITE_BUSY || stepped == SQLITE_LOCKED { throw Busy() }
+        guard stepped == SQLITE_ROW, let bytes = sqlite3_column_blob(statement, 0) else { return nil }
         let data = Data(bytes: bytes, count: Int(sqlite3_column_bytes(statement, 0)))
         guard let plist = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any],
               let hashes = plist["NSStoreModelVersionHashes"] as? [String: Any] else { return nil }
@@ -33,7 +47,7 @@ public enum StoreCompatibility {
 
     /// Throws `NewerStore` when the store has entities this version does not know.
     public static func check(store url: URL, knownEntities: Set<String> = Set(Schema(KanbanSchema.models).entities.map(\.name))) throws {
-        guard let stored = storedEntities(at: url) else { return }
+        guard let stored = try storedEntities(at: url) else { return }
         let unknown = stored.subtracting(knownEntities)
         if !unknown.isEmpty { throw NewerStore(entities: unknown.sorted()) }
     }

@@ -23,11 +23,11 @@ struct BotoApp: App {
             storeURL = try BotoPaths.storeURL()
             try StoreCompatibility.check(store: storeURL)
             container = try ModelContainer(for: Schema(KanbanSchema.models), configurations: ModelConfiguration(url: storeURL))
-        } catch let newer as StoreCompatibility.NewerStore {
-            // Say why instead of crashing: nothing was opened or changed, and the person only has to update Boto.
+        } catch let refused as any LocalizedError where refused is StoreCompatibility.NewerStore || refused is StoreCompatibility.Busy {
+            // Say why instead of crashing: nothing was opened or changed.
             let alert = NSAlert()
             alert.messageText = "Boto cannot open this database"
-            alert.informativeText = newer.localizedDescription
+            alert.informativeText = refused.localizedDescription
             alert.runModal()
             exit(1)
         } catch {
