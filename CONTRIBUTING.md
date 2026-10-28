@@ -26,6 +26,7 @@ The hooks block commits that contain secrets or local data files, and reject a c
 - Core logic goes in `KanbanCore` and must not depend on SwiftUI. Views go in `KanbanUI`.
 - `swift test` must pass. For interface changes, run the app and say what you checked.
 - Commits are signed when possible. Do not use `--no-verify`.
+- Every change that users can see goes in `CHANGELOG.md` and in `CHANGELOG.pt-BR.md`. Each release publishes both, and CI fails when a version is in one file and not in the other.
 - The pull request title follows Conventional Commits too: pull requests are squash merged, so the title becomes the commit on `main` and GitHub adds the pull request number, for example `feat(mcp): add boto-mcp (#12)`. CI checks the title. The commits inside the branch are not kept.
 
 By contributing you agree that your work is licensed under the [GNU AGPL-3.0](LICENSE).
