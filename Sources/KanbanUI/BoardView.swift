@@ -172,7 +172,7 @@ public struct BoardView: View {
     @State private var menuOpen = false
     @State private var showFlow = false
     @State private var showTime = false
-    @State private var showNotes = false
+    @State private var noteFocusId: String?
     @State private var calendarMessage: String?
     @AppStorage("groupByImportance") private var groupByImportance = false
     @Environment(\.isCompactWindow) private var compact
@@ -206,6 +206,9 @@ public struct BoardView: View {
                     // A narrow window shows the lists one under another, like a plain list, instead of side by side.
                     ScrollView(.vertical) {
                         VStack(spacing: 16) {
+                            if let project = board.project, !project.liveNotes.isEmpty {
+                                NotesColumn(project: project, focusId: $noteFocusId, fill: true)
+                            }
                             ForEach(visibleLists, id: \.publicId) {
                                 ListView(list: $0, filter: filter, showArchived: showArchived, selection: $selection, fill: true)
                             }
@@ -216,6 +219,9 @@ public struct BoardView: View {
                 } else {
                     ScrollView(.horizontal) {
                         HStack(alignment: .top, spacing: 20) {
+                            if let project = board.project, !project.liveNotes.isEmpty {
+                                NotesColumn(project: project, focusId: $noteFocusId)
+                            }
                             ForEach(visibleLists, id: \.publicId) {
                                 ListView(list: $0, filter: filter, showArchived: showArchived, selection: $selection)
                             }
@@ -240,7 +246,6 @@ public struct BoardView: View {
             Button("OK") { calendarMessage = nil }
         } message: { Text(calendarMessage ?? "") }
         .sheet(isPresented: $showTime) { if let project = board.project { HoursView(project: project) } }
-        .sheet(isPresented: $showNotes) { if let project = board.project { ProjectNotesView(project: project) } }
     }
 
     private var header: some View {
@@ -279,14 +284,14 @@ public struct BoardView: View {
                     }
                     .buttonStyle(ToolbarButtonStyle(primary: false))
                     .help("Hours worked in this project")
-                    Button { showNotes = true } label: {
+                    Button { noteFocusId = board.project?.addNote().publicId } label: {
                         HStack(spacing: 8) {
-                            Image(systemName: "note.text")
-                            if !compact { Text("Notes") }
+                            Image(systemName: "note.text.badge.plus")
+                            if !compact { Text("Note") }
                         }
                     }
                     .buttonStyle(ToolbarButtonStyle(primary: false))
-                    .help("Sticky notes for this project")
+                    .help("Add a sticky note to this board")
                 }
                 FilterButton(filter: $filter, labels: board.labels, lists: board.orderedLists, iconOnly: compact)
                 Button {
