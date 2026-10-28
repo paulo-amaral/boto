@@ -161,11 +161,6 @@ struct ListView: View {
 
 public struct BoardView: View {
     @Bindable var board: Board
-    let onChooseRoot: () -> Void
-    let onDelete: () -> Void
-    let onChangeIcon: (() -> Void)?
-    let onDuplicate: (() -> Void)?
-    let onDuplicateStructure: (() -> Void)?
     @State private var filter = CardFilter()
     @State private var selection: Set<String> = []
     @State private var showArchived = false
@@ -184,14 +179,8 @@ public struct BoardView: View {
         board.orderedLists.flatMap(\.orderedCards).filter { selection.contains($0.publicId) }
     }
 
-    public init(board: Board, onChooseRoot: @escaping () -> Void, onDelete: @escaping () -> Void, onChangeIcon: (() -> Void)? = nil,
-                onDuplicate: (() -> Void)? = nil, onDuplicateStructure: (() -> Void)? = nil) {
+    public init(board: Board) {
         self.board = board
-        self.onChooseRoot = onChooseRoot
-        self.onDelete = onDelete
-        self.onChangeIcon = onChangeIcon
-        self.onDuplicate = onDuplicate
-        self.onDuplicateStructure = onDuplicateStructure
     }
 
     public var body: some View {
@@ -347,11 +336,6 @@ public struct BoardView: View {
             showArchived.toggle()
         }]
         entries.append(DropdownEntry(icon: "calendar.badge.plus", title: "Add dated cards to Apple Calendar", action: addDatedCardsToCalendar))
-        if let project = board.project {
-            entries.append(.divider)
-            entries += ProjectMenu.entries(for: project, onChangeIcon: onChangeIcon, onDuplicate: onDuplicate,
-                                          onDuplicateStructure: onDuplicateStructure, onChooseRoot: onChooseRoot, onDelete: onDelete)
-        }
         return entries
     }
 

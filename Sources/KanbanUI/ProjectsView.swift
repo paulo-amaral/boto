@@ -248,14 +248,7 @@ public struct ProjectsView: View {
     @ViewBuilder
     private var detail: some View {
         if let project = selected, let board = project.activeBoards.first {
-            BoardView(
-                board: board,
-                onChooseRoot: { chooseRoot(for: project) },
-                onDelete: { deleting = project },
-                onChangeIcon: { changingIcon = project },
-                onDuplicate: { duplicate(project) },
-                onDuplicateStructure: { duplicate(project, withCards: false) }
-            )
+            BoardView(board: board)
                 .id(board.publicId)
         } else {
             VStack(spacing: 12) {
